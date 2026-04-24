@@ -4,18 +4,18 @@ import { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 
 const navLinks = [
-  { name: "Home", href: "#" },
+  { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   {
     name: "Projects",
-    href: "#",
+    href: "/projects",
     dropdown: [
       { name: "Project 1", href: "#" },
       { name: "Project 2", href: "#" },
       { name: "Project 3", href: "#" },
     ],
   },
-  { name: "Blog", href: "#" },
+  { name: "Blog", href: "/blog" },
   { name: "Contact Us", href: "#" },
 ];
 
@@ -53,14 +53,17 @@ export default function Navbar() {
                     onMouseEnter={() => setIsProjectsOpen(true)}
                     onMouseLeave={() => setIsProjectsOpen(false)}
                   >
-                    <button className="flex items-center gap-1 text-sm font-medium text-[#4A4A4A] transition-colors hover:text-[#29ABE2]">
+                    <a
+                      href="/projects"
+                      className="flex items-center gap-1 text-sm font-medium text-[#4A4A4A] transition-colors hover:text-[#29ABE2]"
+                    >
                       {link.name}
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
                           isProjectsOpen ? "rotate-180" : ""
                         }`}
                       />
-                    </button>
+                    </a>
                     {isProjectsOpen && (
                       <div className="absolute left-0 top-full mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5">
                         {link.dropdown.map((item) => (
