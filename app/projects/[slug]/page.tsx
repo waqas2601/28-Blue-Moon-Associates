@@ -257,7 +257,7 @@ export default function ProjectDetailPage() {
                       placeholder="Your Name"
                       value={formData.name}
                       onChange={handleFormChange}
-                      className="w-full rounded border text-black border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                      className="w-full rounded border text-[#4A4A4A] border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                       required
                     />
                   </div>
@@ -268,7 +268,7 @@ export default function ProjectDetailPage() {
                       placeholder="Your Phone"
                       value={formData.phone}
                       onChange={handleFormChange}
-                      className="w-full rounded border text-black border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                      className="w-full rounded border text-[#4A4A4A] border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                       required
                     />
                   </div>
@@ -279,7 +279,7 @@ export default function ProjectDetailPage() {
                       value={formData.message}
                       onChange={handleFormChange}
                       rows={4}
-                      className="w-full rounded border text-black border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                      className="w-full rounded border text-[#4A4A4A] border-gray-300 px-4 py-2 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                     />
                   </div>
                   <button

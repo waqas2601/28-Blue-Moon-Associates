@@ -205,7 +205,7 @@ export default function BlogPage() {
 
                     {/* Read More Link */}
                     <a
-                      href="#"
+                      href={`/blog/${post.id}`}
                       className="inline-flex items-center gap-2 text-[#29ABE2] font-semibold hover:gap-3 transition-all duration-300"
                     >
                       Read More

@@ -10,13 +10,12 @@ const navLinks = [
     name: "Projects",
     href: "/projects",
     dropdown: [
-      { name: "Project 1", href: "#" },
-      { name: "Project 2", href: "#" },
-      { name: "Project 3", href: "#" },
+      { name: "Residential", href: "/projects" },
+      { name: "Commercial", href: "/projects" },
     ],
   },
   { name: "Blog", href: "/blog" },
-  { name: "Contact Us", href: "#" },
+  { name: "Contact Us", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -49,7 +48,7 @@ export default function Navbar() {
               <div key={link.name} className="relative">
                 {link.dropdown ? (
                   <div
-                    className="group"
+                    className="relative"
                     onMouseEnter={() => setIsProjectsOpen(true)}
                     onMouseLeave={() => setIsProjectsOpen(false)}
                   >
@@ -65,7 +64,7 @@ export default function Navbar() {
                       />
                     </a>
                     {isProjectsOpen && (
-                      <div className="absolute left-0 top-full mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5">
+                      <div className="absolute left-0 top-full w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5">
                         {link.dropdown.map((item) => (
                           <a
                             key={item.name}
