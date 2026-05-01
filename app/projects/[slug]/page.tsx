@@ -9,7 +9,7 @@ import {
   Car,
   Shield,
   Trees,
-  //   Mosque,
+  Landmark,
 } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -43,7 +43,7 @@ export default function ProjectDetailPage() {
     { icon: Car, label: "Parking" },
     { icon: Shield, label: "Security" },
     { icon: Trees, label: "Park" },
-    // { icon: Mosque, label: "Mosque" },
+    { icon: Landmark, label: "Mosque" },
   ];
 
   const paymentPlan = [

@@ -5,13 +5,36 @@ import { Menu, X, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
+  { name: "About Us", href: "/about" },
   {
-    name: "Projects",
+    name: "Services",
+    dropdown: [
+      { name: "Property Consultation", href: "/services#consultation" },
+      { name: "Buy a Property", href: "/services#buy" },
+      { name: "Sell Your Property", href: "/services#sell" },
+      { name: "Construction & Development", href: "/services#construction" },
+    ],
+  },
+  {
+    name: "Properties",
     href: "/projects",
     dropdown: [
-      { name: "Residential", href: "/projects" },
-      { name: "Commercial", href: "/projects" },
+      { name: "Featured Listings", href: "/projects" },
+      { name: "Residential Properties", href: "/projects?type=Residential" },
+      { name: "Commercial Properties", href: "/projects?type=Commercial" },
+      { name: "Plots for Sale", href: "/projects?type=Plot" },
+    ],
+  },
+  {
+    name: "Societies",
+    dropdown: [
+      { name: "Faisal Hills", href: "/projects?society=Faisal Hills" },
+      { name: "Multi Garden B-17", href: "/projects?society=B-17" },
+      { name: "Faisal Town", href: "/projects?society=Faisal Town" },
+      {
+        name: "Faisal Town Phase II",
+        href: "/projects?society=Faisal Town Phase II",
+      },
     ],
   },
   { name: "Blog", href: "/blog" },
@@ -20,8 +43,10 @@ const navLinks = [
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProjectsOpen, setIsProjectsOpen] = useState(false);
-  const [isMobileProjectsOpen, setIsMobileProjectsOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileOpenDropdown, setMobileOpenDropdown] = useState<string | null>(
+    null,
+  );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
@@ -45,38 +70,43 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
-              <div key={link.name} className="relative">
+              <div
+                key={link.name}
+                className="relative"
+                onMouseEnter={() =>
+                  link.dropdown ? setOpenDropdown(link.name) : null
+                }
+                onMouseLeave={() =>
+                  link.dropdown ? setOpenDropdown(null) : null
+                }
+              >
                 {link.dropdown ? (
-                  <div
-                    className="relative"
-                    onMouseEnter={() => setIsProjectsOpen(true)}
-                    onMouseLeave={() => setIsProjectsOpen(false)}
-                  >
+                  <>
                     <a
-                      href="/projects"
+                      href={link.href || "#"}
                       className="flex items-center gap-1 text-sm font-medium text-[#4A4A4A] transition-colors hover:text-[#29ABE2]"
                     >
                       {link.name}
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
-                          isProjectsOpen ? "rotate-180" : ""
+                        className={`h-4 w-4 transition-transform duration-200 ${
+                          openDropdown === link.name ? "rotate-180" : ""
                         }`}
                       />
                     </a>
-                    {isProjectsOpen && (
-                      <div className="absolute left-0 top-full w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5">
+                    {openDropdown === link.name && (
+                      <div className="absolute left-0 top-full w-56 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5">
                         {link.dropdown.map((item) => (
                           <a
                             key={item.name}
                             href={item.href}
-                            className="block px-4 py-2 text-sm text-[#4A4A4A] transition-colors hover:bg-[#29ABE2]/10 hover:text-[#29ABE2]"
+                            className="block px-4 py-2 text-sm text-[#4A4A4A] transition-colors hover:bg-[#E3F2FD] hover:text-[#29ABE2]"
                           >
                             {item.name}
                           </a>
                         ))}
                       </div>
                     )}
-                  </div>
+                  </>
                 ) : (
                   <a
                     href={link.href}
@@ -119,24 +149,26 @@ export default function Navbar() {
                     <div>
                       <button
                         onClick={() =>
-                          setIsMobileProjectsOpen(!isMobileProjectsOpen)
+                          setMobileOpenDropdown(
+                            mobileOpenDropdown === link.name ? null : link.name,
+                          )
                         }
                         className="flex w-full items-center justify-between px-4 py-2 text-sm font-medium text-[#4A4A4A] transition-colors hover:bg-gray-50 hover:text-[#29ABE2]"
                       >
                         {link.name}
                         <ChevronDown
-                          className={`h-4 w-4 transition-transform ${
-                            isMobileProjectsOpen ? "rotate-180" : ""
+                          className={`h-4 w-4 transition-transform duration-200 ${
+                            mobileOpenDropdown === link.name ? "rotate-180" : ""
                           }`}
                         />
                       </button>
-                      {isMobileProjectsOpen && (
+                      {mobileOpenDropdown === link.name && (
                         <div className="bg-gray-50 py-2">
                           {link.dropdown.map((item) => (
                             <a
                               key={item.name}
                               href={item.href}
-                              className="block px-8 py-2 text-sm text-[#4A4A4A] transition-colors hover:text-[#29ABE2]"
+                              className="block px-8 py-2 text-sm text-[#4A4A4A] transition-colors hover:bg-[#E3F2FD] hover:text-[#29ABE2]"
                             >
                               {item.name}
                             </a>
@@ -154,7 +186,7 @@ export default function Navbar() {
                   )}
                 </div>
               ))}
-              <div className="px-4 pt-2">
+              <div className="border-t border-gray-100 px-4 pt-4">
                 <a
                   href="#"
                   className="block w-full rounded-full bg-[#29ABE2] px-6 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"

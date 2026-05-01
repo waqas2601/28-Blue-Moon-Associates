@@ -1,136 +1,161 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Navbar from "@/components/navbar"
-import Footer from "@/components/footer"
-import { Bed, Bath, Ruler, MapPin } from "lucide-react"
+import { useEffect, useState } from "react";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
+import { Bed, Bath, Ruler, MapPin } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 interface Project {
-  id: number
-  title: string
-  city: string
-  type: string
-  beds: number
-  baths: number
-  area: string
-  price: string
-  image: string
+  id: number;
+  title: string;
+  city: string;
+  type: string;
+  beds: number;
+  baths: number;
+  area: string;
+  price: string;
+  image: string;
 }
 
 const projects: Project[] = [
   {
     id: 1,
-    title: "Modern Residential Complex",
-    city: "Islamabad",
+    title: "Faisal Hills Block A",
+    city: "Faisal Hills",
     type: "Residential",
     beds: 4,
     baths: 3,
-    area: "4500 sq ft",
-    price: "PKR 8.5 Cr",
-    image: "https://images.unsplash.com/photo-1512917774080-9b274b397534?w=500&h=400&fit=crop"
+    area: "10 Marla",
+    price: "PKR 2.5 Cr",
+    image:
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=400&fit=crop",
   },
   {
     id: 2,
-    title: "Business Hub Tower",
-    city: "Lahore",
+    title: "Faisal Town Commercial Plaza",
+    city: "Faisal Town",
     type: "Commercial",
     beds: 0,
     baths: 0,
-    area: "10000 sq ft",
-    price: "PKR 15 Cr",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&h=400&fit=crop"
+    area: "5 Marla",
+    price: "PKR 1.8 Cr",
+    image:
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop",
   },
   {
     id: 3,
-    title: "Luxury Apartments",
-    city: "Karachi",
+    title: "B-17 Luxury Apartments",
+    city: "B-17",
     type: "Residential",
     beds: 3,
     baths: 2,
-    area: "3500 sq ft",
-    price: "PKR 6.2 Cr",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=400&fit=crop"
+    area: "8 Marla",
+    price: "PKR 1.2 Cr",
+    image:
+      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=400&fit=crop",
   },
   {
     id: 4,
-    title: "Executive Apartments",
-    city: "Rawalpindi",
-    type: "Residential",
-    beds: 2,
-    baths: 2,
-    area: "2500 sq ft",
-    price: "PKR 4.5 Cr",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a9f4ef042?w=500&h=400&fit=crop"
-  },
-  {
-    id: 5,
-    title: "Commercial Plaza",
-    city: "Islamabad",
-    type: "Commercial",
-    beds: 0,
-    baths: 0,
-    area: "8000 sq ft",
-    price: "PKR 12 Cr",
-    image: "https://images.unsplash.com/photo-1460925895917-adf4e7fb518b?w=500&h=400&fit=crop"
-  },
-  {
-    id: 6,
-    title: "Family Villas",
-    city: "Lahore",
+    title: "Bahria Town Executive Villas",
+    city: "Bahria Town",
     type: "Residential",
     beds: 5,
     baths: 4,
-    area: "6000 sq ft",
-    price: "PKR 10.5 Cr",
-    image: "https://images.unsplash.com/photo-1570129477492-45a003537e1f?w=500&h=400&fit=crop"
+    area: "1 Kanal",
+    price: "PKR 4.5 Cr",
+    image:
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500&h=400&fit=crop",
+  },
+  {
+    id: 5,
+    title: "DHA Office Complex",
+    city: "DHA",
+    type: "Commercial",
+    beds: 0,
+    baths: 0,
+    area: "10 Marla",
+    price: "PKR 3.2 Cr",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-adf4e565db18?w=500&h=400&fit=crop",
+  },
+  {
+    id: 6,
+    title: "Faisal Hills Corner Plot",
+    city: "Faisal Hills",
+    type: "Residential",
+    beds: 3,
+    baths: 2,
+    area: "7 Marla",
+    price: "PKR 95 Lac",
+    image:
+      "https://images.unsplash.com/photo-1570129477492-45a003537e1f?w=500&h=400&fit=crop",
   },
   {
     id: 7,
-    title: "Retail Market",
-    city: "Karachi",
+    title: "Bahria Town Shop",
+    city: "Bahria Town",
     type: "Commercial",
     beds: 0,
     baths: 0,
-    area: "12000 sq ft",
-    price: "PKR 18 Cr",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop"
+    area: "250 Sqft",
+    price: "PKR 45 Lac",
+    image:
+      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&h=400&fit=crop",
   },
   {
     id: 8,
-    title: "Premium Residences",
-    city: "Rawalpindi",
+    title: "Faisal Town Phase 2 House",
+    city: "Faisal Town",
     type: "Residential",
-    beds: 3,
+    beds: 4,
     baths: 3,
-    area: "4000 sq ft",
-    price: "PKR 7.8 Cr",
-    image: "https://images.unsplash.com/photo-1512917774080-9b274b397534?w=500&h=400&fit=crop"
+    area: "10 Marla",
+    price: "PKR 3.5 Cr",
+    image:
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=400&fit=crop",
   },
   {
     id: 9,
-    title: "Office Complex",
-    city: "Islamabad",
+    title: "B-17 Commercial Plot",
+    city: "B-17",
     type: "Commercial",
     beds: 0,
     baths: 0,
-    area: "15000 sq ft",
-    price: "PKR 22 Cr",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop"
-  }
-]
-
+    area: "4 Marla",
+    price: "PKR 1.1 Cr",
+    image:
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&h=400&fit=crop",
+  },
+];
 export default function ProjectsPage() {
-  const [activeCity, setActiveCity] = useState("All")
-  const [activeType, setActiveType] = useState("All Types")
+  const [activeCity, setActiveCity] = useState("All");
+  const [activeType, setActiveType] = useState("All Types");
 
-  const cities = ["All", "Islamabad", "Rawalpindi", "Lahore", "Karachi"]
-  const types = ["All Types", "Residential", "Commercial"]
-
+  const cities = [
+    "All",
+    "Faisal Hills",
+    "Faisal Town",
+    "Faisal Town Phase II",
+    "B-17",
+    "Bahria Town",
+    "DHA",
+  ];
+  const types = ["All Types", "Residential", "Commercial", "Plot"];
   const filteredProjects = projects.filter((project) => {
-    const cityMatch = activeCity === "All" || project.city === activeCity
-    const typeMatch = activeType === "All Types" || project.type === activeType
-    return cityMatch && typeMatch
-  })
+    const cityMatch = activeCity === "All" || project.city === activeCity;
+    const typeMatch = activeType === "All Types" || project.type === activeType;
+    return cityMatch && typeMatch;
+  });
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const society = searchParams.get("society");
+    const type = searchParams.get("type");
+    if (society) setActiveCity(society);
+    if (type) setActiveType(type);
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -140,17 +165,21 @@ export default function ProjectsPage() {
       <section
         className="relative min-h-[450px] bg-cover bg-center pt-20"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&h=600&fit=crop')"
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&h=600&fit=crop')",
         }}
       >
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative z-10 flex flex-col items-center justify-center h-full min-h-[450px] px-4 py-20">
-          <p className="text-[#C9963A] text-sm font-semibold uppercase tracking-widest mb-4">Our Projects</p>
+          <p className="text-[#C9963A] text-sm font-semibold uppercase tracking-widest mb-4">
+            Our Projects
+          </p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-6 max-w-3xl">
             Explore Our Developments
           </h1>
           <p className="text-white/70 text-lg max-w-2xl text-center">
-            Discover our portfolio of premium residential and commercial projects across Pakistan
+            Discover our portfolio of premium residential and commercial
+            projects across Pakistan
           </p>
         </div>
       </section>
@@ -160,7 +189,9 @@ export default function ProjectsPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* City Filters */}
           <div className="mb-6">
-            <p className="text-[#4A4A4A] font-semibold text-sm mb-4">Filter by City</p>
+            <p className="text-[#4A4A4A] font-semibold text-sm mb-4">
+              Filter by Society
+            </p>
             <div className="flex flex-wrap gap-3">
               {cities.map((city) => (
                 <button
@@ -180,7 +211,9 @@ export default function ProjectsPage() {
 
           {/* Type Filters */}
           <div>
-            <p className="text-[#4A4A4A] font-semibold text-sm mb-4">Filter by Type</p>
+            <p className="text-[#4A4A4A] font-semibold text-sm mb-4">
+              Filter by Type
+            </p>
             <div className="flex flex-wrap gap-3">
               {types.map((type) => (
                 <button
@@ -205,7 +238,10 @@ export default function ProjectsPage() {
         {filteredProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
-              <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div
+                key={project.id}
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+              >
                 {/* Image Container */}
                 <div className="relative h-64 overflow-hidden">
                   <img
@@ -225,22 +261,30 @@ export default function ProjectsPage() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-[#4A4A4A] mb-4">{project.title}</h3>
+                  <h3 className="text-xl font-bold text-[#4A4A4A] mb-4">
+                    {project.title}
+                  </h3>
 
                   {/* Features Row */}
                   {project.type === "Residential" && (
                     <div className="flex items-center gap-6 mb-4 pb-4 border-b border-gray-200">
                       <div className="flex items-center gap-2 text-[#4A4A4A]">
                         <Bed size={20} className="text-[#29ABE2]" />
-                        <span className="text-sm font-medium">{project.beds}</span>
+                        <span className="text-sm font-medium">
+                          {project.beds}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-[#4A4A4A]">
                         <Bath size={20} className="text-[#29ABE2]" />
-                        <span className="text-sm font-medium">{project.baths}</span>
+                        <span className="text-sm font-medium">
+                          {project.baths}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-[#4A4A4A]">
                         <Ruler size={20} className="text-[#29ABE2]" />
-                        <span className="text-sm font-medium">{project.area}</span>
+                        <span className="text-sm font-medium">
+                          {project.area}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -248,12 +292,16 @@ export default function ProjectsPage() {
                   {project.type === "Commercial" && (
                     <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-200 text-[#4A4A4A]">
                       <Ruler size={20} className="text-[#29ABE2]" />
-                      <span className="text-sm font-medium">{project.area}</span>
+                      <span className="text-sm font-medium">
+                        {project.area}
+                      </span>
                     </div>
                   )}
 
                   {/* Price */}
-                  <p className="text-2xl font-bold text-[#29ABE2] mb-4">{project.price}</p>
+                  <p className="text-2xl font-bold text-[#29ABE2] mb-4">
+                    {project.price}
+                  </p>
 
                   {/* Location */}
                   <div className="flex items-center gap-2 text-[#4A4A4A] mb-6">
@@ -263,22 +311,27 @@ export default function ProjectsPage() {
 
                   {/* View Details Button */}
                   <button
-  onClick={() => window.location.href = `/projects/${project.id}`}
-  className="w-full bg-[#29ABE2] text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
-  View Details
-</button>
+                    onClick={() =>
+                      (window.location.href = `/projects/${project.id}`)
+                    }
+                    className="w-full bg-[#29ABE2] text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                  >
+                    View Details
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-[#4A4A4A] text-lg">No projects found. Try adjusting your filters.</p>
+            <p className="text-[#4A4A4A] text-lg">
+              No projects found. Try adjusting your filters.
+            </p>
           </div>
         )}
       </section>
 
       <Footer />
     </main>
-  )
+  );
 }

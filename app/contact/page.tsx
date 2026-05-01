@@ -10,8 +10,8 @@ export default function ContactPage() {
     fullName: "",
     phone: "",
     email: "",
-    city: "",
-    project: "",
+    purpose: "",
+    society: "",
     propertyType: "",
     message: "",
   });
@@ -31,13 +31,12 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Reset form
     setFormData({
       fullName: "",
       phone: "",
       email: "",
-      city: "",
-      project: "",
+      purpose: "",
+      society: "",
       propertyType: "",
       message: "",
     });
@@ -120,20 +119,20 @@ export default function ContactPage() {
             <h2 className="text-3xl font-bold text-[#4A4A4A] mb-6">
               Send Us a Message
             </h2>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Full Name */}
               <div>
                 <label className="block text-[#4A4A4A] font-medium mb-2">
-                  Full Name
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Your name"
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition"
+                  placeholder="Your full name"
+                  minLength={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                   required
                 />
               </div>
@@ -141,7 +140,7 @@ export default function ContactPage() {
               {/* Phone Number */}
               <div>
                 <label className="block text-[#4A4A4A] font-medium mb-2">
-                  Phone Number
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -149,7 +148,7 @@ export default function ContactPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+92 300 0000000"
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                   required
                 />
               </div>
@@ -158,6 +157,9 @@ export default function ContactPage() {
               <div>
                 <label className="block text-[#4A4A4A] font-medium mb-2">
                   Email
+                  <span className="text-gray-400 text-xs ml-2">
+                    (We'll primarily contact you via WhatsApp/Phone)
+                  </span>
                 </label>
                 <input
                   type="email"
@@ -165,48 +167,51 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition"
-                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                 />
               </div>
 
-              {/* City Dropdown */}
+              {/* Purpose of Inquiry */}
               <div>
                 <label className="block text-[#4A4A4A] font-medium mb-2">
-                  City
+                  Purpose of Inquiry <span className="text-red-500">*</span>
                 </label>
                 <select
-                  name="city"
-                  value={formData.city}
+                  name="purpose"
+                  value={formData.purpose}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                   required
                 >
-                  <option value="">Select a city</option>
-                  <option value="Islamabad">Islamabad</option>
-                  <option value="Rawalpindi">Rawalpindi</option>
-                  <option value="Lahore">Lahore</option>
-                  <option value="Karachi">Karachi</option>
+                  <option value="">— Select Your Purpose —</option>
+                  <option value="Buy a Property">Buy a Property</option>
+                  <option value="Sell My Property">Sell My Property</option>
+                  <option value="Investment Advice">Investment Advice</option>
+                  <option value="General Consultation">
+                    General Consultation
+                  </option>
                 </select>
               </div>
 
-              {/* Interested Project */}
+              {/* Interested Society */}
               <div>
                 <label className="block text-[#4A4A4A] font-medium mb-2">
-                  Interested Project
+                  Interested Society
                 </label>
                 <select
-                  name="project"
-                  value={formData.project}
+                  name="society"
+                  value={formData.society}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition bg-white"
-                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                 >
-                  <option value="">Select a project</option>
-                  <option value="Project 1">Project 1</option>
-                  <option value="Project 2">Project 2</option>
-                  <option value="Project 3">Project 3</option>
-                  <option value="Project 4">Project 4</option>
+                  <option value="">— All Societies —</option>
+                  <option value="Faisal Hills">Faisal Hills</option>
+                  <option value="Multi Garden B-17">Multi Garden B-17</option>
+                  <option value="Faisal Town">Faisal Town</option>
+                  <option value="Faisal Town Phase II">
+                    Faisal Town Phase II
+                  </option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -219,13 +224,15 @@ export default function ContactPage() {
                   name="propertyType"
                   value={formData.propertyType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition bg-white"
-                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                 >
-                  <option value="">Select property type</option>
-                  <option value="Residential">Residential</option>
-                  <option value="Commercial">Commercial</option>
-                  <option value="Both">Both</option>
+                  <option value="">— Select Property Type —</option>
+                  <option value="Residential Plot">Residential Plot</option>
+                  <option value="Commercial Plot">Commercial Plot</option>
+                  <option value="House / Villa">House / Villa</option>
+                  <option value="Apartment / Flat">Apartment / Flat</option>
+                  <option value="Farm House">Farm House</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -238,14 +245,13 @@ export default function ContactPage() {
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Tell us about your inquiry..."
+                  placeholder="Tell us about your requirement..."
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] focus:border-transparent transition resize-none"
-                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <button
                 type="submit"
                 className="w-full bg-[#29ABE2] text-white py-3 rounded-lg font-semibold hover:bg-[#1f8ab0] transition duration-300"

@@ -3,16 +3,7 @@
 import { useState } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 
-const cities = [
-  "Islamabad",
-  "Rawalpindi",
-  "Lahore",
-  "Karachi",
-  "Peshawar",
-  "Faisalabad",
-  "Multan",
-  "Quetta",
-];
+const cities = ["Faisal Hills", "Faisal Town", "B-17", "Bahria Town", "DHA"];
 
 const projects = [
   "The Grand Residencia",
@@ -29,8 +20,8 @@ export default function Contact() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
-    city: "",
-    project: "",
+    purpose: "",
+    society: "",
     propertyType: "",
     message: "",
   });
@@ -116,149 +107,124 @@ export default function Contact() {
 
           {/* Right Column - Form */}
           <div className="rounded-xl bg-white p-6 shadow-lg md:p-8">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-              {/* Full Name */}
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] placeholder:text-gray-400 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
-                />
-              </div>
+           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+  {/* Full Name */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Full Name <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="text"
+      name="fullName"
+      value={formData.fullName}
+      onChange={handleChange}
+      placeholder="Enter your full name"
+      minLength={3}
+      className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+      required
+    />
+  </div>
 
-              {/* Phone Number */}
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Enter your phone number"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] placeholder:text-gray-400 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
-                />
-              </div>
+  {/* Phone */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Phone Number <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="tel"
+      name="phone"
+      value={formData.phone}
+      onChange={handleChange}
+      placeholder="+92 300 0000000"
+      className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+      required
+    />
+  </div>
 
-              {/* City Dropdown */}
-              <div>
-                <label
-                  htmlFor="city"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  City
-                </label>
-                <select
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
-                >
-                  <option value="">Select your city</option>
-                  {cities.map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
-              </div>
+  {/* Purpose */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Purpose of Inquiry <span className="text-red-500">*</span>
+    </label>
+    <select
+      name="purpose"
+      value={formData.purpose}
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+      required
+    >
+      <option value="">— Select Your Purpose —</option>
+      <option value="Buy a Property">Buy a Property</option>
+      <option value="Sell My Property">Sell My Property</option>
+      <option value="Investment Advice">Investment Advice</option>
+      <option value="General Consultation">General Consultation</option>
+    </select>
+  </div>
 
-              {/* Interested Project Dropdown */}
-              <div>
-                <label
-                  htmlFor="project"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  Interested Project
-                </label>
-                <select
-                  id="project"
-                  name="project"
-                  value={formData.project}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
-                >
-                  <option value="">Select a project</option>
-                  {projects.map((project) => (
-                    <option key={project} value={project}>
-                      {project}
-                    </option>
-                  ))}
-                </select>
-              </div>
+  {/* Society */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Interested Society
+    </label>
+    <select
+      name="society"
+      value={formData.society}
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+    >
+      <option value="">— All Societies —</option>
+      <option value="Faisal Hills">Faisal Hills</option>
+      <option value="Multi Garden B-17">Multi Garden B-17</option>
+      <option value="Faisal Town">Faisal Town</option>
+      <option value="Faisal Town Phase II">Faisal Town Phase II</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
 
-              {/* Property Type Dropdown */}
-              <div>
-                <label
-                  htmlFor="propertyType"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  Property Type
-                </label>
-                <select
-                  id="propertyType"
-                  name="propertyType"
-                  value={formData.propertyType}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
-                >
-                  <option value="">Select property type</option>
-                  {propertyTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
+  {/* Property Type */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Property Type
+    </label>
+    <select
+      name="propertyType"
+      value={formData.propertyType}
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+    >
+      <option value="">— Select Property Type —</option>
+      <option value="Residential Plot">Residential Plot</option>
+      <option value="Commercial Plot">Commercial Plot</option>
+      <option value="House / Villa">House / Villa</option>
+      <option value="Apartment / Flat">Apartment / Flat</option>
+      <option value="Farm House">Farm House</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
 
-              {/* Message Textarea */}
-              <div>
-                <label
-                  htmlFor="message"
-                  className="mb-2 block text-sm font-medium text-[#4A4A4A]"
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Tell us about your requirements..."
-                  rows={4}
-                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] placeholder:text-gray-400 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                />
-              </div>
+  {/* Message */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+      Message
+    </label>
+    <textarea
+      name="message"
+      value={formData.message}
+      onChange={handleChange}
+      placeholder="Tell us about your requirement..."
+      rows={4}
+      className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+    />
+  </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
-              >
-                Send Message
-              </button>
-            </form>
+  {/* Submit */}
+  <button
+    type="submit"
+    className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
+  >
+    Send Message
+  </button>
+</form>
           </div>
         </div>
       </div>
