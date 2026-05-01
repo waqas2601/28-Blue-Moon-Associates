@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Bed, Bath, Ruler, MapPin } from "lucide-react";
@@ -128,7 +128,7 @@ const projects: Project[] = [
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&h=400&fit=crop",
   },
 ];
-export default function ProjectsPage() {
+function ProjectsContent() {
   const [activeCity, setActiveCity] = useState("All");
   const [activeType, setActiveType] = useState("All Types");
 
@@ -333,5 +333,19 @@ export default function ProjectsPage() {
 
       <Footer />
     </main>
+  );
+}
+
+export default function ProjectsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-[#29ABE2] text-xl font-semibold">Loading...</p>
+        </div>
+      }
+    >
+      <ProjectsContent />
+    </Suspense>
   );
 }
