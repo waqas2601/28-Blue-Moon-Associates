@@ -8,6 +8,8 @@ const navLinks = [
   { name: "About Us", href: "/about" },
   {
     name: "Services",
+    href: "/services",
+
     dropdown: [
       { name: "Property Consultation", href: "/services#consultation" },
       { name: "Buy a Property", href: "/services#buy" },
@@ -27,6 +29,8 @@ const navLinks = [
   },
   {
     name: "Societies",
+    href: "/projects",
+
     dropdown: [
       { name: "Faisal Hills", href: "/projects?society=Faisal Hills" },
       { name: "Multi Garden B-17", href: "/projects?society=B-17" },
@@ -127,7 +131,8 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden"
+            type="button"
+            className="lg:hidden p-2 rounded-md text-[#4A4A4A] hover:bg-gray-100"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
