@@ -6,39 +6,25 @@ import { Menu, X, ChevronDown } from "lucide-react";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "About Us", href: "/about" },
-  {
-    name: "Services",
-    href: "/services",
-
-    dropdown: [
-      { name: "Property Consultation", href: "/services#consultation" },
-      { name: "Buy a Property", href: "/services#buy" },
-      { name: "Sell Your Property", href: "/services#sell" },
-      { name: "Construction & Development", href: "/services#construction" },
-    ],
-  },
+  { name: "Services", href: "/services" },
   {
     name: "Properties",
-    href: "/projects",
+    href: "/properties",
     dropdown: [
-      { name: "Featured Listings", href: "/projects" },
-      { name: "Residential Properties", href: "/projects?type=Residential" },
-      { name: "Commercial Properties", href: "/projects?type=Commercial" },
-      { name: "Plots for Sale", href: "/projects?type=Plot" },
+      { name: "Featured Listings", href: "/properties" },
+      { name: "Residential Properties", href: "/properties?type=Residential" },
+      { name: "Commercial Properties", href: "/properties?type=Commercial" },
+      { name: "Plots for Sale", href: "/properties?type=Plot" },
     ],
   },
   {
     name: "Societies",
-    href: "/projects",
-
+    href: "/societies",
     dropdown: [
-      { name: "Faisal Hills", href: "/projects?society=Faisal Hills" },
-      { name: "Multi Garden B-17", href: "/projects?society=B-17" },
-      { name: "Faisal Town", href: "/projects?society=Faisal Town" },
-      {
-        name: "Faisal Town Phase II",
-        href: "/projects?society=Faisal Town Phase II",
-      },
+      { name: "Faisal Hills", href: "/societies/faisal-hills" },
+      { name: "Multi Garden B-17", href: "/societies/b-17" },
+      { name: "Faisal Town", href: "/societies/faisal-town" },
+      { name: "Faisal Town Phase II", href: "/societies/faisal-town-phase-2" },
     ],
   },
   { name: "Blog", href: "/blog" },
