@@ -210,7 +210,7 @@ export default async function SocietyPage({
                 </button>
 
                 <a
-                  href={`https://wa.me/923311110066?text=Hi, I am interested in ${society.name}. Please contact me.`}
+                  href={`https://wa.me/923369218748?text=Hi, I am interested in properties in ${society.name}. Please contact me.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 rounded-lg bg-green-500 px-6 py-3 font-semibold text-white hover:bg-green-600 transition-colors"

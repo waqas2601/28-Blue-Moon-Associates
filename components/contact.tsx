@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { SuccessPopup, ConfirmPopup } from "./success-popup";
 
 const cities = ["Faisal Hills", "Faisal Town", "B-17", "Bahria Town", "DHA"];
 
@@ -25,6 +27,9 @@ export default function Contact() {
     propertyType: "",
     message: "",
   });
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -35,10 +40,38 @@ export default function Contact() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle form submission logic here
+  const handleSubmit = async () => {
+    setIsLoading(true);
+
+    const { error } = await supabase.from("leads").insert([
+      {
+        name: formData.fullName,
+        phone: formData.phone,
+        email: "",
+        purpose: formData.purpose,
+        society: formData.society,
+        property_type: formData.propertyType,
+        message: formData.message,
+        source_page: "Homepage",
+      },
+    ]);
+
+    setIsLoading(false);
+    setShowConfirm(false);
+
+    if (error) {
+      alert("Something went wrong. Please try again.");
+    } else {
+      setShowSuccess(true);
+      setFormData({
+        fullName: "",
+        phone: "",
+        purpose: "",
+        society: "",
+        propertyType: "",
+        message: "",
+      });
+    }
   };
 
   return (
@@ -75,7 +108,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-bold text-[#4A4A4A]">Call Us</h3>
-                  <p className="text-[#4A4A4A]/70">+92 331 111 0066</p>
+                  <p className="text-[#4A4A4A]/70">+92 336 921 8748</p>{" "}
                 </div>
               </div>
 
@@ -107,127 +140,145 @@ export default function Contact() {
 
           {/* Right Column - Form */}
           <div className="rounded-xl bg-white p-6 shadow-lg md:p-8">
-           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-  {/* Full Name */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Full Name <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="text"
-      name="fullName"
-      value={formData.fullName}
-      onChange={handleChange}
-      placeholder="Enter your full name"
-      minLength={3}
-      className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-      required
-    />
-  </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {/* Full Name */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  minLength={3}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  required
+                />
+              </div>
 
-  {/* Phone */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Phone Number <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="tel"
-      name="phone"
-      value={formData.phone}
-      onChange={handleChange}
-      placeholder="+92 300 0000000"
-      className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-      required
-    />
-  </div>
+              {/* Phone */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+92 300 0000000"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  required
+                />
+              </div>
 
-  {/* Purpose */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Purpose of Inquiry <span className="text-red-500">*</span>
-    </label>
-    <select
-      name="purpose"
-      value={formData.purpose}
-      onChange={handleChange}
-      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-      required
-    >
-      <option value="">— Select Your Purpose —</option>
-      <option value="Buy a Property">Buy a Property</option>
-      <option value="Sell My Property">Sell My Property</option>
-      <option value="Investment Advice">Investment Advice</option>
-      <option value="General Consultation">General Consultation</option>
-    </select>
-  </div>
+              {/* Purpose */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Purpose of Inquiry <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="purpose"
+                  value={formData.purpose}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  required
+                >
+                  <option value="">— Select Your Purpose —</option>
+                  <option value="Buy a Property">Buy a Property</option>
+                  <option value="Sell My Property">Sell My Property</option>
+                  <option value="Investment Advice">Investment Advice</option>
+                  <option value="General Consultation">
+                    General Consultation
+                  </option>
+                </select>
+              </div>
 
-  {/* Society */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Interested Society
-    </label>
-    <select
-      name="society"
-      value={formData.society}
-      onChange={handleChange}
-      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-    >
-      <option value="">— All Societies —</option>
-      <option value="Faisal Hills">Faisal Hills</option>
-      <option value="Multi Garden B-17">Multi Garden B-17</option>
-      <option value="Faisal Town">Faisal Town</option>
-      <option value="Faisal Town Phase II">Faisal Town Phase II</option>
-      <option value="Other">Other</option>
-    </select>
-  </div>
+              {/* Society */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Interested Society
+                </label>
+                <select
+                  name="society"
+                  value={formData.society}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                >
+                  <option value="">— All Societies —</option>
+                  <option value="Faisal Hills">Faisal Hills</option>
+                  <option value="Multi Garden B-17">Multi Garden B-17</option>
+                  <option value="Faisal Town">Faisal Town</option>
+                  <option value="Faisal Town Phase II">
+                    Faisal Town Phase II
+                  </option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
 
-  {/* Property Type */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Property Type
-    </label>
-    <select
-      name="propertyType"
-      value={formData.propertyType}
-      onChange={handleChange}
-      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-    >
-      <option value="">— Select Property Type —</option>
-      <option value="Residential Plot">Residential Plot</option>
-      <option value="Commercial Plot">Commercial Plot</option>
-      <option value="House / Villa">House / Villa</option>
-      <option value="Apartment / Flat">Apartment / Flat</option>
-      <option value="Farm House">Farm House</option>
-      <option value="Other">Other</option>
-    </select>
-  </div>
+              {/* Property Type */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Property Type
+                </label>
+                <select
+                  name="propertyType"
+                  value={formData.propertyType}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                >
+                  <option value="">— Select Property Type —</option>
+                  <option value="Residential Plot">Residential Plot</option>
+                  <option value="Commercial Plot">Commercial Plot</option>
+                  <option value="House / Villa">House / Villa</option>
+                  <option value="Apartment / Flat">Apartment / Flat</option>
+                  <option value="Farm House">Farm House</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
 
-  {/* Message */}
-  <div>
-    <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
-      Message
-    </label>
-    <textarea
-      name="message"
-      value={formData.message}
-      onChange={handleChange}
-      placeholder="Tell us about your requirement..."
-      rows={4}
-      className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-    />
-  </div>
+              {/* Message */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
+                  Message
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Tell us about your requirement..."
+                  rows={4}
+                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                />
+              </div>
 
-  {/* Submit */}
-  <button
-    type="submit"
-    className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
-  >
-    Send Message
-  </button>
-</form>
+              {/* Submit */}
+              <button
+                type="button"
+                onClick={() => setShowConfirm(true)}
+                className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
+              >
+                Send Message
+              </button>
+            </form>
           </div>
         </div>
       </div>
+      <ConfirmPopup
+        isOpen={showConfirm}
+        onConfirm={handleSubmit}
+        onCancel={() => setShowConfirm(false)}
+        isLoading={isLoading}
+      />
+
+      <SuccessPopup
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="Message Sent!"
+        message="Thank you! Our team will contact you within 24 hours."
+      />
     </section>
   );
 }

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { supabase } from "@/lib/supabase";
+import { SuccessPopup, ConfirmPopup } from "@/components/success-popup";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -15,6 +17,10 @@ export default function ContactPage() {
     propertyType: "",
     message: "",
   });
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -28,18 +34,39 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    setFormData({
-      fullName: "",
-      phone: "",
-      email: "",
-      purpose: "",
-      society: "",
-      propertyType: "",
-      message: "",
-    });
+  const handleSubmit = async () => {
+    setIsLoading(true);
+
+    const { error } = await supabase.from("leads").insert([
+      {
+        name: formData.fullName,
+        phone: formData.phone,
+        email: formData.email,
+        purpose: formData.purpose,
+        society: formData.society,
+        property_type: formData.propertyType,
+        message: formData.message,
+        source_page: "Contact Page",
+      },
+    ]);
+
+    setIsLoading(false);
+    setShowConfirm(false);
+
+    if (error) {
+      alert("Something went wrong. Please try again.");
+    } else {
+      setShowSuccess(true);
+      setFormData({
+        fullName: "",
+        phone: "",
+        email: "",
+        purpose: "",
+        society: "",
+        propertyType: "",
+        message: "",
+      });
+    }
   };
 
   return (
@@ -79,7 +106,7 @@ export default function ContactPage() {
               <Phone className="w-6 h-6 text-[#29ABE2]" />
             </div>
             <h3 className="text-xl font-bold text-[#4A4A4A] mb-2">Call Us</h3>
-            <p className="text-[#4A4A4A]/70">+92 331 111 0066</p>
+            <p className="text-[#4A4A4A]/70">+92 336 921 8748</p>
           </div>
 
           {/* Email Card */}
@@ -132,7 +159,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   placeholder="Your full name"
                   minLength={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                   required
                 />
               </div>
@@ -148,7 +175,7 @@ export default function ContactPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+92 300 0000000"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                   required
                 />
               </div>
@@ -167,7 +194,7 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                 />
               </div>
 
@@ -180,7 +207,7 @@ export default function ContactPage() {
                   name="purpose"
                   value={formData.purpose}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                   required
                 >
                   <option value="">— Select Your Purpose —</option>
@@ -202,7 +229,7 @@ export default function ContactPage() {
                   name="society"
                   value={formData.society}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                 >
                   <option value="">— All Societies —</option>
                   <option value="Faisal Hills">Faisal Hills</option>
@@ -224,7 +251,7 @@ export default function ContactPage() {
                   name="propertyType"
                   value={formData.propertyType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                 >
                   <option value="">— Select Property Type —</option>
                   <option value="Residential Plot">Residential Plot</option>
@@ -247,13 +274,14 @@ export default function ContactPage() {
                   onChange={handleChange}
                   placeholder="Tell us about your requirement..."
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 text-[#4A4A4A] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
                 />
               </div>
 
               {/* Submit */}
               <button
-                type="submit"
+                type="button"
+                onClick={() => setShowConfirm(true)}
                 className="w-full bg-[#29ABE2] text-white py-3 rounded-lg font-semibold hover:bg-[#1f8ab0] transition duration-300"
               >
                 Send Message
@@ -277,12 +305,29 @@ export default function ContactPage() {
             <button className="bg-white text-[#29ABE2] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
               View Projects
             </button>
-            <button className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300">
+            <a
+              href="https://wa.me/923369218748?text=Hi, I submitted an inquiry on your website. Please contact me."
+              className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300"
+            >
               WhatsApp Us
-            </button>
+            </a>
           </div>
         </div>
       </section>
+
+      <ConfirmPopup
+        isOpen={showConfirm}
+        onConfirm={handleSubmit}
+        onCancel={() => setShowConfirm(false)}
+        isLoading={isLoading}
+      />
+
+      <SuccessPopup
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="Message Sent!"
+        message="Thank you for reaching out! Our team will contact you within 24 hours via WhatsApp or phone."
+      />
 
       <Footer />
     </main>

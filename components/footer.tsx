@@ -2,11 +2,11 @@ import { Phone, Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
   const quickLinks = [
-    { name: "Home", href: "#" },
-    { name: "About Us", href: "#about" },
-    { name: "Projects", href: "#projects" },
-    { name: "Blog", href: "#blog" },
-    { name: "Contact Us", href: "#contact" },
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
+    { name: "Projects", href: "/properties" },
+    { name: "Blog", href: "/blog" },
+    { name: "Contact Us", href: "/contact" },
   ];
 
   const projects = [
@@ -56,7 +56,7 @@ export default function Footer() {
                 Youtube
               </a>
               <a
-                href="#"
+                href="https://wa.me/923369218748?text=Hi, I found your website and I am interested in your properties. Please contact me."
                 className="text-sm font-medium text-[#29ABE2] hover:text-[#29ABE2]/80"
               >
                 WhatsApp
@@ -110,7 +110,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <Phone className="mt-0.5 h-5 w-5 shrink-0 text-[#29ABE2]" />
-                <span className="text-white/70">+92 331 111 0066</span>
+                <span className="text-white/70">+92 336 921 8748</span>
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="mt-0.5 h-5 w-5 shrink-0 text-[#29ABE2]" />

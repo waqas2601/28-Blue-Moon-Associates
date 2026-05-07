@@ -14,7 +14,7 @@ export default function ServicesPage() {
       description:
         "Our experienced consultants provide comprehensive guidance on all aspects of real estate investment and property management. We analyze market trends, assess property values, and help you make informed decisions tailored to your financial goals and lifestyle preferences.",
       image:
-        "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=500&fit=crop",
+        "https://www.grrowpropertymanagement.com/OnlineImages/BlogImage/5-reasons-to-hire-a-property-consultant-for-your-next-investment-b.jpg",
       points: [
         "Market analysis and property valuation",
         "Investment strategy consultation",
@@ -30,8 +30,7 @@ export default function ServicesPage() {
       heading: "Find Your Dream Property",
       description:
         "Discover our extensive portfolio of premium properties across Pakistan. We offer personalized property matching, virtual tours, financing assistance, and seamless transaction handling to make your home buying journey smooth and hassle-free.",
-      image:
-        "https://images.unsplash.com/photo-1570129477492-45a003537e1b?w=600&h=500&fit=crop",
+      image: "https://nexthome.pk/wp-content/uploads/2022/12/house.jpg",
       points: [
         "Curated property listings",
         "Flexible financing options",
@@ -48,7 +47,7 @@ export default function ServicesPage() {
       description:
         "Maximize your property's value with our expert marketing and sales strategies. We handle everything from professional photography and marketing to negotiations and documentation, ensuring a quick and profitable sale.",
       image:
-        "https://images.unsplash.com/photo-1573504867269-d9b5a5f5b5f5?w=600&h=500&fit=crop",
+        "https://hometriangle.com/blogs/content/images/2024/05/hometriangle-blog-sell-my-house-fast.jpg",
       points: [
         "Professional property marketing",
         "Expert price optimization",
@@ -65,7 +64,7 @@ export default function ServicesPage() {
       description:
         "From concept to completion, we manage all aspects of construction and real estate development. Our team combines innovative design with quality craftsmanship to deliver projects that exceed expectations and create lasting value.",
       image:
-        "https://images.unsplash.com/photo-1581578731548-c64695c952952?w=600&h=500&fit=crop",
+        "https://proformaco.com/wp-content/uploads/2016/03/construction-copy.jpg",
       points: [
         "End-to-end project management",
         "Quality assurance and compliance",

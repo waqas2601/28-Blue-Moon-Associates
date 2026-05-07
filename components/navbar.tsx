@@ -108,7 +108,7 @@ export default function Navbar() {
               </div>
             ))}
             <a
-              href="#"
+              href="/contact"
               className="rounded-full bg-[#29ABE2] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
             >
               Book Now

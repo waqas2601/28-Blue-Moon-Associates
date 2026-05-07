@@ -39,13 +39,13 @@ export default function Hero() {
         {/* Buttons */}
         <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
           <a
-            href="#projects"
+            href="/properties"
             className="rounded-full bg-[#29ABE2] px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[#29ABE2]/90 sm:text-base"
           >
-            View Projects
+            View Properties
           </a>
           <a
-            href="#contact"
+            href="/contact"
             className="rounded-full border-2 border-white px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#4A4A4A] sm:text-base"
           >
             Contact Us

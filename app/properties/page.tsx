@@ -1,8 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { supabase } from "@/lib/supabase";
 import {
   Search,
   Filter,
@@ -16,137 +18,8 @@ import {
   Home,
   Building2,
   TreePine,
+  Loader2,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-
-const sampleProperties = [
-  {
-    id: 1,
-    title: "Modern Family Home",
-    society: "Faisal Hills",
-    type: "Residential",
-    beds: 4,
-    baths: 3,
-    area: "10 Marla",
-    price: "PKR 2.5 Cr",
-    priceNum: 25000000,
-    location: "Faisal Hills, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Luxury Apartment",
-    society: "Multi Garden B-17",
-    type: "Residential",
-    beds: 3,
-    baths: 2,
-    area: "8 Marla",
-    price: "PKR 1.2 Cr",
-    priceNum: 12000000,
-    location: "B-17, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Commercial Office Space",
-    society: "Faisal Town",
-    type: "Commercial",
-    beds: 0,
-    baths: 2,
-    area: "5 Marla",
-    price: "PKR 80 Lac",
-    priceNum: 8000000,
-    location: "Faisal Town, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Prime Residential Plot",
-    society: "Faisal Town Phase II",
-    type: "Plot",
-    beds: 0,
-    baths: 0,
-    area: "1 Kanal",
-    price: "PKR 2 Cr",
-    priceNum: 20000000,
-    location: "Faisal Town Phase II",
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Spacious Corner Villa",
-    society: "Faisal Hills",
-    type: "Residential",
-    beds: 5,
-    baths: 4,
-    area: "1 Kanal",
-    price: "PKR 4.5 Cr",
-    priceNum: 45000000,
-    location: "Faisal Hills, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop",
-  },
-  {
-    id: 6,
-    title: "Commercial Shop",
-    society: "Multi Garden B-17",
-    type: "Commercial",
-    beds: 0,
-    baths: 1,
-    area: "4 Marla",
-    price: "PKR 50 Lac",
-    priceNum: 5000000,
-    location: "B-17, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
-  },
-  {
-    id: 7,
-    title: "Beautiful Family House",
-    society: "Faisal Town",
-    type: "Residential",
-    beds: 3,
-    baths: 2,
-    area: "7 Marla",
-    price: "PKR 85 Lac",
-    priceNum: 8500000,
-    location: "Faisal Town, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1570129477492-45a003537e1f?w=400&h=300&fit=crop",
-  },
-  {
-    id: 8,
-    title: "Commercial Plaza",
-    society: "Faisal Town Phase II",
-    type: "Commercial",
-    beds: 0,
-    baths: 2,
-    area: "10 Marla",
-    price: "PKR 1.8 Cr",
-    priceNum: 18000000,
-    location: "Faisal Town Phase II",
-    image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop",
-  },
-  {
-    id: 9,
-    title: "Residential Plot",
-    society: "Faisal Hills",
-    type: "Plot",
-    beds: 0,
-    baths: 0,
-    area: "5 Marla",
-    price: "PKR 45 Lac",
-    priceNum: 4500000,
-    location: "Faisal Hills, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop",
-  },
-];
 
 const typeIcons: Record<string, React.ReactNode> = {
   Residential: <Home className="h-3.5 w-3.5" />,
@@ -155,21 +28,17 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 function PropertiesContent() {
+  const [properties, setProperties] = useState<any[]>([]);
+  const [filtered, setFiltered] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSociety, setSelectedSociety] = useState("All");
   const [selectedType, setSelectedType] = useState("All Types");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const type = searchParams.get("type");
-    const society = searchParams.get("society");
-    if (type) setSelectedType(type);
-    if (society) setSelectedSociety(society);
-  }, [searchParams]);
 
   const societies = [
     "All",
@@ -181,6 +50,45 @@ function PropertiesContent() {
 
   const propertyTypes = ["All Types", "Residential", "Commercial", "Plot"];
 
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const { data } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setProperties(data || []);
+      setFiltered(data || []);
+      setIsLoading(false);
+    };
+    fetchProperties();
+  }, []);
+
+  useEffect(() => {
+    const type = searchParams.get("type");
+    const society = searchParams.get("society");
+    if (type) setSelectedType(type);
+    if (society) setSelectedSociety(society);
+  }, [searchParams]);
+
+  useEffect(() => {
+    let result = properties;
+    if (searchQuery) {
+      result = result.filter(
+        (prop) =>
+          prop.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prop.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prop.society?.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+    if (selectedSociety !== "All") {
+      result = result.filter((prop) => prop.society === selectedSociety);
+    }
+    if (selectedType !== "All Types") {
+      result = result.filter((prop) => prop.type === selectedType);
+    }
+    setFiltered(result);
+  }, [searchQuery, selectedSociety, selectedType, properties]);
+
   const resetFilters = () => {
     setSearchQuery("");
     setSelectedSociety("All");
@@ -189,24 +97,8 @@ function PropertiesContent() {
     setMaxPrice("");
   };
 
-  const filteredProperties = sampleProperties.filter((prop) => {
-    const matchesSearch =
-      prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prop.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prop.society.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSociety =
-      selectedSociety === "All" || prop.society === selectedSociety;
-    const matchesType =
-      selectedType === "All Types" || prop.type === selectedType;
-    const min = minPrice ? parseInt(minPrice) * 1000000 : 0;
-    const max = maxPrice ? parseInt(maxPrice) * 1000000 : Infinity;
-    const matchesPrice = prop.priceNum >= min && prop.priceNum <= max;
-    return matchesSearch && matchesSociety && matchesType && matchesPrice;
-  });
-
   const FilterPanel = () => (
     <div className="space-y-6">
-      {/* Search */}
       <div>
         <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#4A4A4A]">
           Search
@@ -222,11 +114,7 @@ function PropertiesContent() {
           />
         </div>
       </div>
-
-      {/* Divider */}
       <div className="h-px bg-gray-100" />
-
-      {/* Society */}
       <div>
         <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-[#4A4A4A]">
           Society
@@ -247,11 +135,7 @@ function PropertiesContent() {
           ))}
         </div>
       </div>
-
-      {/* Divider */}
       <div className="h-px bg-gray-100" />
-
-      {/* Property Type */}
       <div>
         <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-[#4A4A4A]">
           Property Type
@@ -273,37 +157,7 @@ function PropertiesContent() {
           ))}
         </div>
       </div>
-
-      {/* Divider */}
       <div className="h-px bg-gray-100" />
-
-      {/* Price Range */}
-      <div>
-        <label className="mb-3 block text-xs font-bold uppercase tracking-wider text-[#4A4A4A]">
-          Price Range (in Crore)
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            placeholder="Min"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-            className="w-1/2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-[#4A4A4A] placeholder-gray-400 focus:border-[#29ABE2] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-1/2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-[#4A4A4A] placeholder-gray-400 focus:border-[#29ABE2] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-          />
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="h-px bg-gray-100" />
-
-      {/* Reset */}
       <button
         onClick={resetFilters}
         className="w-full rounded-lg border-2 border-[#29ABE2] px-4 py-2.5 text-sm font-semibold text-[#29ABE2] transition-colors hover:bg-[#29ABE2] hover:text-white"
@@ -326,10 +180,11 @@ function PropertiesContent() {
                   Properties
                 </h1>
                 <p className="mt-0.5 text-sm text-gray-500">
-                  {filteredProperties.length} properties found
+                  {isLoading
+                    ? "Loading..."
+                    : `${filtered.length} properties found`}
                 </p>
               </div>
-              {/* Mobile Filter Button */}
               <button
                 onClick={() => setShowFiltersDrawer(true)}
                 className="flex items-center gap-2 rounded-lg border-2 border-[#29ABE2] px-4 py-2 text-sm font-semibold text-[#29ABE2] lg:hidden"
@@ -341,10 +196,9 @@ function PropertiesContent() {
           </div>
         </div>
 
-        {/* Main Layout */}
         <div className="mx-auto max-w-7xl px-4 py-8">
           <div className="flex gap-8">
-            {/* Sidebar — Desktop */}
+            {/* Sidebar */}
             <aside className="hidden lg:block">
               <div className="sticky top-24 w-64 rounded-xl bg-white p-6 shadow-sm border border-gray-100">
                 <div className="mb-6 flex items-center justify-between">
@@ -354,9 +208,7 @@ function PropertiesContent() {
                   </div>
                   {(selectedSociety !== "All" ||
                     selectedType !== "All Types" ||
-                    searchQuery ||
-                    minPrice ||
-                    maxPrice) && (
+                    searchQuery) && (
                     <button
                       onClick={resetFilters}
                       className="text-xs text-[#29ABE2] hover:underline"
@@ -371,7 +223,7 @@ function PropertiesContent() {
 
             {/* Properties Grid */}
             <div className="flex-1">
-              {/* Active Filters Tags */}
+              {/* Active Filter Tags */}
               {(selectedSociety !== "All" ||
                 selectedType !== "All Types" ||
                 searchQuery) && (
@@ -403,7 +255,17 @@ function PropertiesContent() {
                 </div>
               )}
 
-              {filteredProperties.length === 0 ? (
+              {/* Loading */}
+              {isLoading ? (
+                <div className="flex h-64 items-center justify-center">
+                  <div className="text-center">
+                    <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#29ABE2]" />
+                    <p className="mt-2 text-sm text-gray-400">
+                      Loading properties...
+                    </p>
+                  </div>
+                </div>
+              ) : filtered.length === 0 ? (
                 <div className="flex h-96 flex-col items-center justify-center rounded-xl bg-white border border-gray-100">
                   <Filter className="mb-4 h-12 w-12 text-gray-300" />
                   <p className="text-lg font-semibold text-gray-500">
@@ -421,19 +283,24 @@ function PropertiesContent() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                  {filteredProperties.map((property) => (
+                  {filtered.map((property: any) => (
                     <div
                       key={property.id}
                       className="group overflow-hidden rounded-xl bg-white shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-1"
                     >
                       {/* Image */}
-                      <div className="relative h-52 overflow-hidden">
-                        <img
-                          src={property.image}
-                          alt={property.title}
-                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        {/* Badges */}
+                      <div className="relative h-52 overflow-hidden bg-gray-100">
+                        {property.images ? (
+                          <img
+                            src={property.images.split(",")[0].trim()}
+                            alt={property.title}
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-gray-100">
+                            <Building2 className="h-12 w-12 text-gray-300" />
+                          </div>
+                        )}
                         <div className="absolute left-3 top-3">
                           <span className="rounded-full bg-[#29ABE2] px-2.5 py-1 text-xs font-semibold text-white shadow">
                             {property.society}
@@ -445,6 +312,19 @@ function PropertiesContent() {
                             {property.type}
                           </span>
                         </div>
+                        {property.status && property.status !== "Available" && (
+                          <div className="absolute bottom-3 left-3">
+                            <span
+                              className={`rounded-full px-2.5 py-1 text-xs font-semibold text-white ${
+                                property.status === "Sold"
+                                  ? "bg-red-500"
+                                  : "bg-yellow-500"
+                              }`}
+                            >
+                              {property.status}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -452,49 +332,47 @@ function PropertiesContent() {
                         <h3 className="mb-2 text-base font-bold text-[#4A4A4A] line-clamp-1">
                           {property.title}
                         </h3>
-
-                        {/* Details */}
                         <div className="mb-3 flex flex-wrap gap-3 text-xs text-gray-500">
-                          {property.type === "Residential" && (
-                            <>
+                          {property.type === "Residential" &&
+                            property.beds > 0 && (
                               <span className="flex items-center gap-1">
                                 <Bed className="h-3.5 w-3.5 text-[#29ABE2]" />
                                 {property.beds} Beds
                               </span>
+                            )}
+                          {property.type === "Residential" &&
+                            property.baths > 0 && (
                               <span className="flex items-center gap-1">
                                 <Bath className="h-3.5 w-3.5 text-[#29ABE2]" />
                                 {property.baths} Baths
                               </span>
-                            </>
+                            )}
+                          {property.area && (
+                            <span className="flex items-center gap-1">
+                              <Maximize2 className="h-3.5 w-3.5 text-[#29ABE2]" />
+                              {property.area}
+                            </span>
                           )}
-                          <span className="flex items-center gap-1">
-                            <Maximize2 className="h-3.5 w-3.5 text-[#29ABE2]" />
-                            {property.area}
-                          </span>
                         </div>
-
-                        {/* Price */}
                         <p className="mb-2 text-lg font-bold text-[#29ABE2]">
                           {property.price}
                         </p>
-
-                        {/* Location */}
-                        <div className="mb-4 flex items-center gap-1 text-xs text-gray-400">
-                          <MapPin className="h-3.5 w-3.5 text-[#C9963A]" />
-                          {property.location}
-                        </div>
-
-                        {/* Buttons */}
+                        {property.location && (
+                          <div className="mb-4 flex items-center gap-1 text-xs text-gray-400">
+                            <MapPin className="h-3.5 w-3.5 text-[#C9963A]" />
+                            {property.location}
+                          </div>
+                        )}
                         <div className="flex gap-2">
                           <a
-                            href={`/properties/${property.id}`}
+                            href={`/properties/${property.slug || property.id}`}
                             className="flex-1 rounded-lg bg-[#29ABE2] py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
                           >
                             View Details
                           </a>
 
                           <a
-                            href={`https://wa.me/923311110066?text=Hi, I am interested in ${property.title} in ${property.society}`}
+                            href={`https://wa.me/923369218748?text=Hi, I am interested in ${property.title} in ${property.society}. Please contact me.`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-1.5 rounded-lg bg-green-500 px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600"
@@ -547,7 +425,7 @@ export default function PropertiesPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <p className="text-[#29ABE2] text-xl font-semibold">Loading...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-[#29ABE2]" />
         </div>
       }
     >

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowRight, Calendar, User } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { supabase } from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 const categories = [
   "All",
@@ -14,95 +16,40 @@ const categories = [
   "Lifestyle",
 ];
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "Top Investment Areas in Islamabad 2025",
-    category: "Investment",
-    date: "March 15, 2025",
-    excerpt:
-      "Discover the most promising investment opportunities in Islamabad this year. Learn which areas are seeing the highest growth potential.",
-    author: "Sarah Ahmed",
-    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-    image:
-      "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=400&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Why Rawalpindi is the Next Big Property Market",
-    category: "Market Trends",
-    date: "March 12, 2025",
-    excerpt:
-      "Rawalpindi's real estate market is experiencing unprecedented growth. Explore the factors driving this transformation.",
-    author: "Ahmed Hassan",
-    avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-    image:
-      "https://images.unsplash.com/photo-1500595046891-8e86bb0a5a86?w=600&h=400&fit=crop",
-  },
-  {
-    id: 3,
-    title: "How to Choose the Right Property Developer",
-    category: "Guides",
-    date: "March 10, 2025",
-    excerpt:
-      "A comprehensive guide to evaluating developers before investing. Know what to look for in track record and credentials.",
-    author: "Fatima Khan",
-    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-    image:
-      "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=400&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Understanding Payment Plans in Pakistan Real Estate",
-    category: "Guides",
-    date: "March 8, 2025",
-    excerpt:
-      "Navigate the various payment plan options available. Learn about installment structures and flexible payment options.",
-    author: "Muhammad Ali",
-    avatar: "https://randomuser.me/api/portraits/men/4.jpg",
-    image:
-      "https://images.unsplash.com/photo-1460925895917-adf4e565db18?w=600&h=400&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Best Housing Schemes in Lahore 2025",
-    category: "News",
-    date: "March 5, 2025",
-    excerpt:
-      "Explore the top-rated housing schemes in Lahore. Compare amenities, locations, and investment returns.",
-    author: "Aisha Malik",
-    avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-    image:
-      "https://images.unsplash.com/photo-1554995207-c18231b6ce4e?w=600&h=400&fit=crop",
-  },
-  {
-    id: 6,
-    title: "Tips for First Time Home Buyers in Pakistan",
-    category: "Lifestyle",
-    date: "March 1, 2025",
-    excerpt:
-      "Essential tips and tricks for first-time buyers. Avoid common mistakes and make informed decisions.",
-    author: "Hassan Ali",
-    avatar: "https://randomuser.me/api/portraits/men/6.jpg",
-    image:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop",
-  },
-];
-
 export default function BlogPage() {
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [filtered, setFiltered] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredPosts =
-    activeCategory === "All"
-      ? blogPosts
-      : blogPosts.filter((post) => post.category === activeCategory);
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const { data } = await supabase
+        .from("blogs")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false });
+      setBlogs(data || []);
+      setFiltered(data || []);
+      setIsLoading(false);
+    };
+    fetchBlogs();
+  }, []);
+
+  useEffect(() => {
+    if (activeCategory === "All") {
+      setFiltered(blogs);
+    } else {
+      setFiltered(blogs.filter((b) => b.category === activeCategory));
+    }
+  }, [activeCategory, blogs]);
 
   return (
     <main className="min-h-screen bg-gray-50">
       <Navbar />
-      {/* Hero Banner */}
+
+      {/* Hero */}
       <section className="relative min-h-[400px] flex items-center justify-center pt-20">
-        {/* Background Image with Overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -111,24 +58,22 @@ export default function BlogPage() {
           }}
         />
         <div className="absolute inset-0 bg-black/60" />
-
-        {/* Content */}
         <div className="relative z-10 text-center px-4">
           <p className="text-[#C9963A] text-sm font-semibold uppercase tracking-widest mb-4">
             Blog & Media
           </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 text-balance">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Latest News & Insights
           </h1>
           <p className="text-white/70 text-lg max-w-2xl mx-auto">
-            Stay updated with industry trends, investment insights, and expert
-            guidance
+            Stay updated with the latest trends and news in Pakistan's real
+            estate market
           </p>
         </div>
       </section>
 
-      {/* Category Filter Bar */}
-      <section className="sticky top-0 z-50 bg-white shadow-md py-4">
+      {/* Category Filter */}
+      <section className="sticky top-0 z-40 bg-white shadow-md py-4">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex flex-wrap gap-3 justify-center">
             {categories.map((category) => (
@@ -151,79 +96,95 @@ export default function BlogPage() {
       {/* Blog Grid */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4">
-          {filteredPosts.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#29ABE2]" />
+                <p className="mt-2 text-sm text-gray-400">Loading blogs...</p>
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-gray-400 text-lg font-medium">
+                No blog posts found
+              </p>
+              <p className="text-gray-400 text-sm mt-1">
+                {activeCategory !== "All"
+                  ? "Try selecting a different category"
+                  : "Blog posts will appear here once published"}
+              </p>
+            </div>
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPosts.map((post) => (
-                <div
+              {filtered.map((post: any) => (
+                <article
                   key={post.id}
-                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+                  className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                 >
-                  {/* Image Container */}
-                  <div className="relative h-64 overflow-hidden bg-gray-200">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                    {/* Category Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-[#C9963A] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  {/* Image */}
+                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                    {post.thumbnail ? (
+                      <img
+                        src={post.thumbnail}
+                        alt={post.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <p className="text-gray-400 text-sm">No image</p>
+                      </div>
+                    )}
+                    {post.category && (
+                      <span className="absolute left-4 top-4 rounded-full bg-[#C9963A] px-3 py-1 text-xs font-semibold text-white">
                         {post.category}
                       </span>
-                    </div>
+                    )}
                   </div>
 
                   {/* Content */}
                   <div className="p-6">
-                    {/* Date */}
-                    <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
-                      <Calendar className="w-4 h-4" />
-                      <span>{post.date}</span>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {new Date(post.created_at).toLocaleDateString("en-PK", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      {post.author && (
+                        <span className="flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          {post.author}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-xl font-bold text-[#4A4A4A] mb-3 line-clamp-2">
+                    <h3 className="text-lg font-bold text-[#4A4A4A] mb-3 line-clamp-2 group-hover:text-[#29ABE2] transition-colors">
                       {post.title}
                     </h3>
 
-                    {/* Excerpt */}
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {post.excerpt}
-                    </p>
+                    {post.excerpt && (
+                      <p className="text-gray-500 text-sm mb-4 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                    )}
 
-                    {/* Author */}
-                    <div className="flex items-center gap-3 mb-4 pt-4 border-t border-gray-200">
-                      <img
-                        src={post.avatar}
-                        alt={post.author}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <span className="text-sm font-medium text-gray-700">
-                        {post.author}
-                      </span>
-                    </div>
-
-                    {/* Read More Link */}
                     <a
-                      href={`/blog/${post.id}`}
+                      href={`/blog/${post.slug || post.id}`}
                       className="inline-flex items-center gap-2 text-[#29ABE2] font-semibold hover:gap-3 transition-all duration-300"
                     >
                       Read More
                       <ArrowRight className="w-4 h-4" />
                     </a>
                   </div>
-                </div>
+                </article>
               ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">
-                No posts found in this category. Try another filter.
-              </p>
             </div>
           )}
         </div>
       </section>
+
       <Footer />
     </main>
   );

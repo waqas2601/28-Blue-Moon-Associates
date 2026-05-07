@@ -4,9 +4,9 @@ export const societies = [
     name: "Faisal Hills",
     location: "Taxila, Rawalpindi",
     image:
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=600&fit=crop",
+      "https://slm.com.pk/wp-content/uploads/2025/10/Why-Faisal-Hills-is-the-Best-Investment-in-Taxila-2025.jpg",
     overviewImage:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=600&fit=crop",
+      "https://www.shutterstock.com/shutterstock/videos/3469818777/thumb/1.jpg",
     established: "2016",
     plots: "5000+",
     noc: "NOC Approved",
@@ -45,10 +45,9 @@ export const societies = [
     slug: "b-17",
     name: "Multi Garden B-17",
     location: "B-17, Islamabad",
-    image:
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=600&fit=crop",
+    image: "https://saweramarketing.com/wp-content/uploads/2021/03/b17.jpg",
     overviewImage:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=600&fit=crop",
+      "https://www.arcodesk.com/wp-content/uploads/2021/06/MPCH-B17-Islamabad-2.jpg",
     established: "2010",
     plots: "8000+",
     noc: "NOC Approved",
@@ -85,9 +84,9 @@ export const societies = [
     name: "Faisal Town",
     location: "Islamabad",
     image:
-      "https://images.unsplash.com/photo-1460317442991-0ec209397118?w=1200&h=600&fit=crop",
+      "https://irealprojects.com/wp-content/uploads/2021/01/faisal-town-islamabad-768x306.jpg",
     overviewImage:
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=600&fit=crop",
+      "https://www.plotsmap.com/wp-content/uploads/2022/08/image-57.png",
     established: "2012",
     plots: "6000+",
     noc: "NOC Approved",
@@ -124,9 +123,9 @@ export const societies = [
     name: "Faisal Town Phase II",
     location: "Islamabad",
     image:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=600&fit=crop",
+      "https://dastak.com.pk/wp-content/uploads/2026/01/Faisal-Town-Phase-2-Gate.webp",
     overviewImage:
-      "https://images.unsplash.com/photo-1570129477492-45a003537e1f?w=600&h=600&fit=crop",
+      "https://faisaltown2.com.pk/wp-content/uploads/2022/10/Faisal-Town-Main-Double-Road.jpg",
     established: "2018",
     plots: "3000+",
     noc: "NOC Approved",
