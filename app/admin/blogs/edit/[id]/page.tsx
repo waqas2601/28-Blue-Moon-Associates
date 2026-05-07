@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Eye } from "lucide-react";
-import { useToast } from "@/components/admin/toast";
+import { Toast, useToast } from "@/components/admin/toast";
 
 export default function EditBlogPage({
   params,
