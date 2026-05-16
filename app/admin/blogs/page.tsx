@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Plus, Pencil, Trash2, Search, Eye, EyeOff } from "lucide-react";
 import { Toast, useToast } from "@/components/admin/toast";
@@ -14,9 +14,31 @@ export default function BlogsPage() {
   const { toast, showToast, hideToast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const fetchBlogs = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await supabase
+        .from("blogs")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setBlogs(data || []);
+      setFiltered(data || []);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchBlogs();
-  }, []);
+  }, [fetchBlogs]);
+
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) fetchBlogs();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [fetchBlogs]);
 
   useEffect(() => {
     if (search) {
@@ -31,16 +53,6 @@ export default function BlogsPage() {
       setFiltered(blogs);
     }
   }, [search, blogs]);
-
-  const fetchBlogs = async () => {
-    const { data } = await supabase
-      .from("blogs")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setBlogs(data || []);
-    setFiltered(data || []);
-    setIsLoading(false);
-  };
 
   const handleDelete = async () => {
     if (!deleteId) return;

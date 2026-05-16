@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { supabase } from "@/lib/supabase";
@@ -27,18 +26,14 @@ const typeIcons: Record<string, React.ReactNode> = {
   Plot: <TreePine className="h-3.5 w-3.5" />,
 };
 
-function PropertiesContent() {
+export default function PropertiesPage() {
   const [properties, setProperties] = useState<any[]>([]);
   const [filtered, setFiltered] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSociety, setSelectedSociety] = useState("All");
   const [selectedType, setSelectedType] = useState("All Types");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  const searchParams = useSearchParams();
 
   const societies = [
     "All",
@@ -50,25 +45,48 @@ function PropertiesContent() {
 
   const propertyTypes = ["All Types", "Residential", "Commercial", "Plot"];
 
-  useEffect(() => {
-    const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const { data } = await supabase
         .from("properties")
         .select("*")
         .order("created_at", { ascending: false });
       setProperties(data || []);
       setFiltered(data || []);
+    } finally {
       setIsLoading(false);
-    };
-    fetchProperties();
+    }
   }, []);
 
   useEffect(() => {
-    const type = searchParams.get("type");
-    const society = searchParams.get("society");
+    fetchProperties();
+  }, [fetchProperties]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      fetchProperties();
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [fetchProperties]);
+
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) fetchProperties();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [fetchProperties]);
+
+  // Read URL params manually
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get("type");
+    const society = params.get("society");
     if (type) setSelectedType(type);
     if (society) setSelectedSociety(society);
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     let result = properties;
@@ -93,8 +111,6 @@ function PropertiesContent() {
     setSearchQuery("");
     setSelectedSociety("All");
     setSelectedType("All Types");
-    setMinPrice("");
-    setMaxPrice("");
   };
 
   const FilterPanel = () => (
@@ -172,26 +188,21 @@ function PropertiesContent() {
       <Navbar />
       <main className="min-h-screen bg-gray-50">
         {/* Title Bar */}
-        <div className="border-b border-gray-200 bg-white pt-20">
-          <div className="mx-auto max-w-7xl px-4 py-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-[#4A4A4A]">
-                  Properties
-                </h1>
-                <p className="mt-0.5 text-sm text-gray-500">
-                  {isLoading
-                    ? "Loading..."
-                    : `${filtered.length} properties found`}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowFiltersDrawer(true)}
-                className="flex items-center gap-2 rounded-lg border-2 border-[#29ABE2] px-4 py-2 text-sm font-semibold text-[#29ABE2] lg:hidden"
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </button>
+        <div className="bg-white border-b border-gray-200 pt-20">
+          <div className="mx-auto max-w-7xl px-4 py-8">
+            <div className="text-center">
+              <span className="inline-flex items-center justify-center gap-2 text-sm uppercase tracking-widest text-[#C9963A] mb-3">
+                <span className="w-8 h-[2px] bg-[#C9963A]" />
+                Real Estate
+                <span className="w-8 h-[2px] bg-[#C9963A]" />
+              </span>
+              <h1 className="text-3xl font-bold text-[#4A4A4A]">
+                Our Properties
+              </h1>
+              <p className="mt-2 text-gray-500 max-w-xl mx-auto">
+                Explore our portfolio of premium residential and commercial
+                properties across top housing societies
+              </p>
             </div>
           </div>
         </div>
@@ -223,6 +234,30 @@ function PropertiesContent() {
 
             {/* Properties Grid */}
             <div className="flex-1">
+              {/* Top Bar */}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-gray-500 font-medium">
+                  {isLoading ? (
+                    "Loading..."
+                  ) : (
+                    <span>
+                      Showing{" "}
+                      <span className="text-[#29ABE2] font-bold">
+                        {filtered.length}
+                      </span>{" "}
+                      properties
+                    </span>
+                  )}
+                </p>
+                <button
+                  onClick={() => setShowFiltersDrawer(true)}
+                  className="flex items-center gap-2 rounded-lg border-2 border-[#29ABE2] px-4 py-2 text-sm font-semibold text-[#29ABE2] lg:hidden"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                </button>
+              </div>
+
               {/* Active Filter Tags */}
               {(selectedSociety !== "All" ||
                 selectedType !== "All Types" ||
@@ -288,7 +323,6 @@ function PropertiesContent() {
                       key={property.id}
                       className="group overflow-hidden rounded-xl bg-white shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-1"
                     >
-                      {/* Image */}
                       <div className="relative h-52 overflow-hidden bg-gray-100">
                         {property.images ? (
                           <img
@@ -326,8 +360,6 @@ function PropertiesContent() {
                           </div>
                         )}
                       </div>
-
-                      {/* Content */}
                       <div className="p-4">
                         <h3 className="mb-2 text-base font-bold text-[#4A4A4A] line-clamp-1">
                           {property.title}
@@ -370,7 +402,6 @@ function PropertiesContent() {
                           >
                             View Details
                           </a>
-
                           <a
                             href={`https://wa.me/923369218748?text=Hi, I am interested in ${property.title} in ${property.society}. Please contact me.`}
                             target="_blank"
@@ -417,19 +448,5 @@ function PropertiesContent() {
       </main>
       <Footer />
     </>
-  );
-}
-
-export default function PropertiesPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#29ABE2]" />
-        </div>
-      }
-    >
-      <PropertiesContent />
-    </Suspense>
   );
 }

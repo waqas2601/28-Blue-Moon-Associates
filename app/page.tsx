@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import About from "@/components/about";
@@ -13,8 +14,13 @@ import {
   MessageCircle,
   Building2,
 } from "lucide-react";
+import { getSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const settings = await getSettings();
+
   // Fetch featured properties
   const { data: featuredProperties } = await supabase
     .from("properties")
@@ -38,6 +44,7 @@ export default async function Home() {
       <About />
 
       {/* Featured Properties Section */}
+
       {featuredProperties && featuredProperties.length > 0 && (
         <section className="bg-[#F5F5F5] py-20">
           <div className="mx-auto max-w-7xl px-4">
@@ -68,10 +75,11 @@ export default async function Home() {
                   {/* Image */}
                   <div className="relative h-56 overflow-hidden bg-gray-100">
                     {property.images ? (
-                      <img
+                      <Image
                         src={property.images.split(",")[0].trim()}
                         alt={property.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center bg-gray-100">
@@ -143,7 +151,7 @@ export default async function Home() {
                       </a>
 
                       <a
-                        href={`https://wa.me/923369218748?text=Hi, I am interested in ${property.title} in ${property.society}. Please contact me.`}
+                        href={`https://wa.me/${settings.whatsapp || "923369218748"}?text=Hi, I am interested in ${property.title} in ${property.society}. Please contact me.`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-center gap-1.5 rounded-lg bg-green-500 px-3 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-green-600"
@@ -168,7 +176,6 @@ export default async function Home() {
           </div>
         </section>
       )}
-
       {/* Blog Section */}
       {latestBlogs && latestBlogs.length > 0 ? (
         <section className="bg-white py-20">
@@ -197,10 +204,11 @@ export default async function Home() {
                 >
                   <div className="relative h-56 overflow-hidden bg-gray-100">
                     {post.thumbnail ? (
-                      <img
+                      <Image
                         src={post.thumbnail}
                         alt={post.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="h-full w-full bg-gray-200" />
@@ -252,7 +260,12 @@ export default async function Home() {
         <Blog />
       )}
 
-      <Contact />
+      <Contact
+        phone={settings.phone || "+92 336 921 8748"}
+        email={settings.email || "info@bluemoonassociates.com"}
+        address={settings.address || "Rawalpindi, Pakistan"}
+      />
+
       <Footer />
     </main>
   );

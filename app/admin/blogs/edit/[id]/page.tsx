@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Eye } from "lucide-react";
 import { Toast, useToast } from "@/components/admin/toast";
+import { uploadImage } from "@/lib/upload";
+import RichTextEditor from "@/components/admin/rich-text-editor";
 
 export default function EditBlogPage({
   params,
@@ -14,8 +16,10 @@ export default function EditBlogPage({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
-  const [showPreview, setShowPreview] = useState(false);
   const { toast, showToast, hideToast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [allBlogs, setAllBlogs] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
@@ -24,11 +28,19 @@ export default function EditBlogPage({
     category: "",
     author: "",
     published: false,
+    seo_title: "",
+    seo_description: "",
+    seo_keywords: "",
+    tags: "",
+    read_time: "",
+    related_blogs: "",
   });
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchData = async () => {
       const { id } = await params;
+
+      // Fetch blog
       const { data } = await supabase
         .from("blogs")
         .select("*")
@@ -44,12 +56,49 @@ export default function EditBlogPage({
           category: data.category || "",
           author: data.author || "",
           published: data.published || false,
+          seo_title: data.seo_title || "",
+          seo_description: data.seo_description || "",
+          seo_keywords: data.seo_keywords || "",
+          tags: data.tags || "",
+          read_time: data.read_time || "",
+          related_blogs: data.related_blogs || "",
         });
       }
+
+      // Fetch categories
+      const { data: cats } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name", { ascending: true });
+      setCategories(cats || []);
+
+      // Fetch all blogs except current
+      const { data: blogs } = await supabase
+        .from("blogs")
+        .select("id, title")
+        .neq("id", id)
+        .order("created_at", { ascending: false });
+      setAllBlogs(blogs || []);
+
       setIsFetching(false);
     };
-    fetchBlog();
+    fetchData();
   }, [params]);
+
+  const handleThumbnailUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const url = await uploadImage(file, "blogs");
+    setIsUploading(false);
+
+    if (url) {
+      setFormData((prev) => ({ ...prev, thumbnail: url }));
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -86,6 +135,12 @@ export default function EditBlogPage({
         category: formData.category,
         author: formData.author,
         published: formData.published,
+        seo_title: formData.seo_title,
+        seo_description: formData.seo_description,
+        seo_keywords: formData.seo_keywords,
+        tags: formData.tags,
+        read_time: formData.read_time,
+        related_blogs: formData.related_blogs,
       })
       .eq("id", id);
 
@@ -110,6 +165,28 @@ export default function EditBlogPage({
     );
   }
 
+  const handleLivePreview = () => {
+    const previewData = {
+      title: formData.title || "Untitled Blog",
+      excerpt: formData.excerpt || "",
+      content: formData.content || "",
+      thumbnail: formData.thumbnail || "",
+      category: formData.category || "",
+      author: formData.author || "",
+      created_at: new Date().toISOString(),
+    };
+    localStorage.setItem("blog_preview", JSON.stringify(previewData));
+    window.open("/blog/preview", "_blank");
+  };
+
+  const getRelatedIds = (related: string) =>
+    related
+      ? related
+          .split(",")
+          .map((b) => b.trim())
+          .filter(Boolean)
+      : [];
+
   return (
     <div>
       {/* Header */}
@@ -128,14 +205,18 @@ export default function EditBlogPage({
             <p className="text-gray-500 text-sm mt-1">Update blog content</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowPreview(!showPreview)}
-          className="flex items-center gap-2 border-2 border-[#29ABE2] text-[#29ABE2] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#29ABE2]/10 transition-colors"
-        >
-          <Eye className="h-4 w-4" />
-          {showPreview ? "Hide Preview" : "Preview"}
-        </button>
+        <div className="flex gap-2">
+          {/* Live Preview */}
+
+          <button
+            type="button"
+            onClick={handleLivePreview}
+            className="flex items-center gap-2 border-2 border-[#29ABE2] text-[#29ABE2] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#29ABE2]/10 transition-colors"
+          >
+            <Eye className="h-4 w-4" />
+            Live Preview
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -160,7 +241,7 @@ export default function EditBlogPage({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
-                    Excerpt
+                    Short Summary
                   </label>
                   <textarea
                     name="excerpt"
@@ -174,44 +255,18 @@ export default function EditBlogPage({
               </div>
             </div>
 
-            {/* Content */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
                 Blog Content <span className="text-red-500">*</span>
               </label>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) =>
+                  setFormData((prev) => ({ ...prev, content }))
+                }
                 placeholder="Write your blog content here..."
-                rows={20}
-                className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
-                required
               />
             </div>
-
-            {/* Preview */}
-            {showPreview && formData.content && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h2 className="text-lg font-bold text-[#4A4A4A] mb-4">
-                  Preview
-                </h2>
-                {formData.thumbnail && (
-                  <img
-                    src={formData.thumbnail}
-                    alt="thumbnail"
-                    className="w-full h-64 object-cover rounded-lg mb-6"
-                  />
-                )}
-                <h1 className="text-2xl font-bold text-[#4A4A4A] mb-4">
-                  {formData.title}
-                </h1>
-                <p className="text-gray-500 text-sm mb-6">{formData.excerpt}</p>
-                <div className="prose max-w-none text-[#4A4A4A]/80 whitespace-pre-wrap text-sm leading-relaxed">
-                  {formData.content}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right — Settings */}
@@ -221,26 +276,96 @@ export default function EditBlogPage({
                 Blog Settings
               </h2>
               <div className="space-y-4">
+                {/* Thumbnail */}
                 <div>
                   <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
-                    Thumbnail URL
+                    Thumbnail Image
                   </label>
-                  <input
-                    type="text"
-                    name="thumbnail"
-                    value={formData.thumbnail}
-                    onChange={handleChange}
-                    placeholder="https://image.jpg"
-                    className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
-                  />
-                  {formData.thumbnail && (
-                    <img
-                      src={formData.thumbnail}
-                      alt="preview"
-                      className="mt-2 w-full h-32 object-cover rounded-lg"
+
+                  {/* Upload area */}
+                  <label
+                    className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                      isUploading
+                        ? "border-[#29ABE2] bg-[#29ABE2]/5"
+                        : "border-gray-300 hover:border-[#29ABE2] hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="h-6 w-6 text-[#29ABE2] animate-spin" />
+                          <p className="text-xs text-[#29ABE2] font-medium">
+                            Uploading...
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-8 h-8 bg-[#29ABE2]/10 rounded-full flex items-center justify-center">
+                            <svg
+                              className="w-4 h-4 text-[#29ABE2]"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            <span className="font-medium text-[#29ABE2]">
+                              Click to upload
+                            </span>
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailUpload}
+                      disabled={isUploading}
+                      className="hidden"
                     />
+                  </label>
+
+                  {/* Preview */}
+                  {formData.thumbnail && (
+                    <div className="relative mt-2 group">
+                      <img
+                        src={formData.thumbnail}
+                        alt="Thumbnail preview"
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, thumbnail: "" }))
+                        }
+                        className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs items-center justify-center hidden group-hover:flex"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
+
+                  {/* Manual URL */}
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-400 mb-1">Or paste URL:</p>
+                    <input
+                      type="text"
+                      name="thumbnail"
+                      value={formData.thumbnail}
+                      onChange={handleChange}
+                      placeholder="https://image.jpg"
+                      className="w-full px-4 py-2 text-[#4A4A4A] border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                    />
+                  </div>
                 </div>
+                {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
                     Category
@@ -252,11 +377,11 @@ export default function EditBlogPage({
                     className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] bg-white"
                   >
                     <option value="">Select Category</option>
-                    <option value="Investment">Investment</option>
-                    <option value="Market Trends">Market Trends</option>
-                    <option value="Guides">Guides</option>
-                    <option value="News">News</option>
-                    <option value="Lifestyle">Lifestyle</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -272,6 +397,154 @@ export default function EditBlogPage({
                     className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
                   />
                 </div>
+
+                {/* Read Time */}
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                    Read Time
+                  </label>
+                  <input
+                    type="text"
+                    name="read_time"
+                    value={formData.read_time}
+                    onChange={handleChange}
+                    placeholder="e.g. 5 min read"
+                    className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  />
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                    Tags
+                    <span className="text-gray-400 text-xs ml-2">
+                      (comma separated)
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleChange}
+                    placeholder="Faisal Hills, Investment, Plots"
+                    className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  />
+                </div>
+                {/* Related Blogs */}
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                    Related Blogs
+                  </label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                    {allBlogs.length === 0 ? (
+                      <p className="text-xs text-gray-400">
+                        No other blogs available
+                      </p>
+                    ) : (
+                      allBlogs.map((blog) => (
+                        <label
+                          key={blog.id}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={getRelatedIds(
+                              formData.related_blogs,
+                            ).includes(String(blog.id))}
+                            onChange={(e) => {
+                              const current = getRelatedIds(
+                                formData.related_blogs,
+                              );
+                              const blogId = String(blog.id);
+                              if (e.target.checked) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  related_blogs: [...current, blogId].join(","),
+                                }));
+                              } else {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  related_blogs: current
+                                    .filter((b) => b !== blogId)
+                                    .join(","),
+                                }));
+                              }
+                            }}
+                            className="h-4 w-4 accent-[#29ABE2]"
+                          />
+                          <span className="text-sm text-[#4A4A4A] line-clamp-1">
+                            {blog.title}
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* SEO Settings */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <h2 className="text-lg font-bold text-[#4A4A4A] mb-4 flex items-center gap-2">
+                    <svg
+                      className="h-5 w-5 text-[#29ABE2]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    SEO Settings
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                        SEO Title
+                      </label>
+                      <input
+                        type="text"
+                        name="seo_title"
+                        value={formData.seo_title}
+                        onChange={handleChange}
+                        placeholder="SEO optimized title..."
+                        className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                        Meta Description
+                      </label>
+                      <textarea
+                        name="seo_description"
+                        value={formData.seo_description}
+                        onChange={handleChange}
+                        placeholder="Brief description for search engines..."
+                        rows={3}
+                        className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        {formData.seo_description.length}/160 characters
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                        Keywords
+                      </label>
+                      <input
+                        type="text"
+                        name="seo_keywords"
+                        value={formData.seo_keywords}
+                        onChange={handleChange}
+                        placeholder="real estate, faisal hills, investment"
+                        className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <input
                     type="checkbox"

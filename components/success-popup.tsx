@@ -87,6 +87,7 @@ interface SuccessPopupProps {
   onClose: () => void;
   title?: string;
   message?: string;
+  whatsapp?: string;
 }
 
 export function SuccessPopup({
@@ -94,6 +95,7 @@ export function SuccessPopup({
   onClose,
   title = "Message Sent!",
   message = "Thank you for contacting us. Our team will get back to you within 24 hours.",
+  whatsapp = "923369218748",
 }: SuccessPopupProps) {
   if (!isOpen) return null;
 
@@ -128,7 +130,7 @@ export function SuccessPopup({
           </button>
 
           <a
-            href="https://wa.me/923369218748?text=Hi, I just submitted an inquiry on your website. Please contact me."
+            href={`https://wa.me/${whatsapp}?text=Hi, I just submitted an inquiry on your website. Please contact me.`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors"

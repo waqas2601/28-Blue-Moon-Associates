@@ -118,7 +118,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             type="button"
-            className="lg:hidden p-2 rounded-md text-[#4A4A4A] hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-md text-[#4A4A4A] hover:bg-gray-100 cursor-pointer"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -138,21 +138,32 @@ export default function Navbar() {
                 <div key={link.name}>
                   {link.dropdown ? (
                     <div>
-                      <button
-                        onClick={() =>
-                          setMobileOpenDropdown(
-                            mobileOpenDropdown === link.name ? null : link.name,
-                          )
-                        }
-                        className="flex w-full items-center justify-between px-4 py-2 text-sm font-medium text-[#4A4A4A] transition-colors hover:bg-gray-50 hover:text-[#29ABE2]"
-                      >
-                        {link.name}
-                        <ChevronDown
-                          className={`h-4 w-4 transition-transform duration-200 ${
-                            mobileOpenDropdown === link.name ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
+                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
+                        <a
+                          href={link.href}
+                          className="text-sm font-medium text-[#4A4A4A] hover:text-[#29ABE2] flex-1"
+                        >
+                          {link.name}
+                        </a>
+                        <button
+                          onClick={() =>
+                            setMobileOpenDropdown(
+                              mobileOpenDropdown === link.name
+                                ? null
+                                : link.name,
+                            )
+                          }
+                          className="p-1 text-[#4A4A4A] hover:text-[#29ABE2]"
+                        >
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform duration-200 ${
+                              mobileOpenDropdown === link.name
+                                ? "rotate-180"
+                                : ""
+                            }`}
+                          />
+                        </button>
+                      </div>
                       {mobileOpenDropdown === link.name && (
                         <div className="bg-gray-50 py-2">
                           {link.dropdown.map((item) => (
@@ -179,7 +190,7 @@ export default function Navbar() {
               ))}
               <div className="border-t border-gray-100 px-4 pt-4">
                 <a
-                  href="#"
+                  href="/contact"
                   className="block w-full rounded-full bg-[#29ABE2] px-6 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
                 >
                   Book Now

@@ -1,12 +1,20 @@
+
 import { supabase } from "@/lib/supabase";
 import { Users, Building2, FileText, TrendingUp } from "lucide-react";
 
 export default async function Dashboard() {
+  const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+  ).toISOString();
+
   const [
     { count: leadsCount },
     { count: propertiesCount },
     { count: blogsCount },
     { data: recentLeads },
+    { count: thisMonthCount },
   ] = await Promise.all([
     supabase.from("leads").select("*", { count: "exact", head: true }),
     supabase.from("properties").select("*", { count: "exact", head: true }),
@@ -16,6 +24,10 @@ export default async function Dashboard() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase
+      .from("leads")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startOfMonth),
   ]);
 
   const stats = [
@@ -45,7 +57,7 @@ export default async function Dashboard() {
     },
     {
       title: "This Month",
-      value: leadsCount || 0,
+      value: thisMonthCount || 0,
       icon: TrendingUp,
       color: "bg-green-500",
       lightColor: "bg-green-50",
@@ -124,7 +136,9 @@ export default async function Dashboard() {
                 recentLeads.map((lead: any) => (
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-[#4A4A4A]">
-                      {lead.name}
+                      <a href="/admin/leads" className="hover:text-[#29ABE2] transition-colors">
+                        {lead.name}
+                      </a>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {lead.phone}

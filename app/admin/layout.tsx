@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Tag,
 } from "lucide-react";
 
 const menuItems = [
@@ -35,6 +36,10 @@ const menuItems = [
     name: "Blogs",
     href: "/admin/blogs",
     icon: FileText,
+    submenu: [
+      { name: "All Blogs", href: "/admin/blogs" },
+      { name: "Categories", href: "/admin/categories" },
+    ],
   },
   {
     name: "Settings",
@@ -55,16 +60,19 @@ export default function AdminLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session && pathname !== "/admin/login") {
-        router.push("/admin/login");
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session && pathname !== "/admin/login") {
+          router.push("/admin/login");
+        }
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -99,24 +107,60 @@ export default function AdminLayout({
         </div>
 
         {/* Menu */}
+        {/* Desktop Navigation */}
         <nav className="flex-1 p-4 space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive =
+              pathname === item.href ||
+              item.submenu?.some((s) => pathname === s.href);
+            const isSubmenuOpen =
+              isActive ||
+              item.submenu?.some((s) => pathname.startsWith(s.href));
+
             return (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-[#29ABE2] text-white"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="font-medium">{item.name}</span>
-                {isActive && <ChevronRight className="h-4 w-4 ml-auto" />}
-              </a>
+              <div key={item.name}>
+                <a
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    pathname === item.href
+                      ? "bg-[#29ABE2] text-white"
+                      : isActive
+                        ? "bg-white/10 text-white"
+                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="font-medium flex-1">{item.name}</span>
+                  {item.submenu && (
+                    <ChevronRight
+                      className={`h-4 w-4 transition-transform ${
+                        isSubmenuOpen ? "rotate-90" : ""
+                      }`}
+                    />
+                  )}
+                </a>
+
+                {/* Submenu */}
+                {item.submenu && isSubmenuOpen && (
+                  <div className="ml-4 mt-1 space-y-1">
+                    {item.submenu.map((sub) => (
+                      <a
+                        key={sub.name}
+                        href={sub.href}
+                        className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all text-sm ${
+                          pathname === sub.href
+                            ? "bg-[#29ABE2] text-white"
+                            : "text-white/60 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        {sub.name}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
@@ -153,23 +197,60 @@ export default function AdminLayout({
                 <X className="h-5 w-5" />
               </button>
             </div>
+            {/* Mobile Menu */}
             <nav className="flex-1 p-4 space-y-1">
               {menuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive =
+                  pathname === item.href ||
+                  item.submenu?.some((s) => pathname === s.href);
+                const isSubmenuOpen =
+                  isActive ||
+                  item.submenu?.some((s) => pathname.startsWith(s.href));
+
                 return (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                      isActive
-                        ? "bg-[#29ABE2] text-white"
-                        : "text-white/70 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.name}</span>
-                  </a>
+                  <div key={item.name}>
+                    <a
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                        pathname === item.href
+                          ? "bg-[#29ABE2] text-white"
+                          : isActive
+                            ? "bg-white/10 text-white"
+                            : "text-white/70 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium flex-1">{item.name}</span>
+                      {item.submenu && (
+                        <ChevronRight
+                          className={`h-4 w-4 transition-transform ${
+                            isSubmenuOpen ? "rotate-90" : ""
+                          }`}
+                        />
+                      )}
+                    </a>
+
+                    {/* Submenu */}
+                    {item.submenu && isSubmenuOpen && (
+                      <div className="ml-4 mt-1 space-y-1">
+                        {item.submenu.map((sub) => (
+                          <a
+                            key={sub.name}
+                            href={sub.href}
+                            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all text-sm ${
+                              pathname === sub.href
+                                ? "bg-[#29ABE2] text-white"
+                                : "text-white/60 hover:bg-white/10 hover:text-white"
+                            }`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                            {sub.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>
@@ -214,7 +295,8 @@ export default function AdminLayout({
           </div>
         </header>
         {/* Page Content */}
-        <main className="flex-1 p-6 overflow-hidden">{children}</main>{" "}
+        {/* key forces the page component to remount on every navigation, preventing stale isLoading:true */}
+        <main className="flex-1 p-6 overflow-hidden" key={pathname}>{children}</main>{" "}
       </div>
     </div>
   );

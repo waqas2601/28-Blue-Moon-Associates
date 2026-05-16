@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Leadership() {
   return (
     <section className="py-20 bg-white">
@@ -22,10 +24,12 @@ export default function Leadership() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
           {/* Image */}
           <div className="relative">
-            <img
-              src="https://randomuser.me/api/portraits/men/32.jpg"
+            <Image
+              src="https://arpacuuzeqewqweswenr.supabase.co/storage/v1/object/public/blue-moon/images/teams/Shafaat_Khan.webp"
               alt="Shafaat Khan"
-              className="rounded-lg shadow-xl w-full h-[500px] object-cover object-top"
+              width={500}
+              height={500}
+              className="rounded-lg shadow-xl w-full h-auto"
             />
             <div className="absolute -bottom-6 -right-6 bg-[#29ABE2] text-white p-6 rounded-lg shadow-lg hidden md:block">
               <div className="text-2xl font-bold">Founder</div>
@@ -46,7 +50,7 @@ export default function Leadership() {
               Founder & CEO
             </span>
             <p className="text-[#4A4A4A]/70 mb-4 leading-relaxed">
-              With over 20 years of experience in Pakistan's real estate sector,
+              With over 5 years of experience in Pakistan's real estate sector,
               Shafaat Khan has led Blue Moon Associates to become one of the
               most trusted names in property consulting and development.
             </p>
@@ -113,10 +117,12 @@ export default function Leadership() {
 
           {/* Image */}
           <div className="relative order-1 lg:order-2">
-            <img
-              src="https://randomuser.me/api/portraits/men/44.jpg"
+            <Image
+              src="https://arpacuuzeqewqweswenr.supabase.co/storage/v1/object/public/blue-moon/images/teams/Abbas_Ali_Khan.webp"
               alt="Abbas Ali"
-              className="rounded-lg shadow-xl w-full h-[500px] object-cover object-top"
+              width={500}
+              height={500}
+              className="rounded-lg shadow-xl w-full h-auto"
             />
             <div className="absolute -bottom-6 -left-6 bg-[#C9963A] text-white p-6 rounded-lg shadow-lg hidden md:block">
               <div className="text-2xl font-bold">Co-Founder</div>

@@ -3,6 +3,8 @@ export const societies = [
     slug: "faisal-hills",
     name: "Faisal Hills",
     location: "Taxila, Rawalpindi",
+    mapEmbed:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3318.954260307077!2d72.81632228470674!3d33.710132449914475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfa3f542e5bd9f%3A0x96778e4eb4081237!2sFaisal%20Hills%20Islamabad!5e0!3m2!1sen!2s!4v1778607581654!5m2!1sen!2s",
     image:
       "https://slm.com.pk/wp-content/uploads/2025/10/Why-Faisal-Hills-is-the-Best-Investment-in-Taxila-2025.jpg",
     overviewImage:
@@ -45,6 +47,8 @@ export const societies = [
     slug: "b-17",
     name: "Multi Garden B-17",
     location: "B-17, Islamabad",
+    mapEmbed:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26558.37261553794!2d72.80104629178994!3d33.68833114971047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfa2335e80520f%3A0xfc81d7db7a273055!2sMulti%20Gardens%20B-17%2C%20Islamabad%2C%20Pakistan!5e0!3m2!1sen!2s!4v1778607804042!5m2!1sen!2s",
     image: "https://saweramarketing.com/wp-content/uploads/2021/03/b17.jpg",
     overviewImage:
       "https://www.arcodesk.com/wp-content/uploads/2021/06/MPCH-B17-Islamabad-2.jpg",
@@ -83,6 +87,8 @@ export const societies = [
     slug: "faisal-town",
     name: "Faisal Town",
     location: "Islamabad",
+    mapEmbed:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13291.433492622518!2d72.86231281910533!3d33.60897899400471!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38df99b54173606d%3A0xef184eca7aa389ec!2sFaisal%20Town%2C%20Islamabad%2C%20Pakistan!5e0!3m2!1sen!2s!4v1778607983018!5m2!1sen!2s",
     image:
       "https://irealprojects.com/wp-content/uploads/2021/01/faisal-town-islamabad-768x306.jpg",
     overviewImage:
@@ -122,6 +128,8 @@ export const societies = [
     slug: "faisal-town-phase-2",
     name: "Faisal Town Phase II",
     location: "Islamabad",
+    mapEmbed:
+      "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d212662.52636666753!2d72.790384!3d33.609145!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38df9b3fc49b7d8b%3A0x6b92e91dfc3f950e!2sFaisal%20Town%20Phase%202%20Site%20Location!5e0!3m2!1sen!2sus!4v1778608139321!5m2!1sen!2sus",
     image:
       "https://dastak.com.pk/wp-content/uploads/2026/01/Faisal-Town-Phase-2-Gate.webp",
     overviewImage:

@@ -2,10 +2,24 @@
 
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
+import Image from "next/image";
 import { Check } from "lucide-react";
 
+interface Service {
+  id: string;
+  number: string;
+  label: string;
+  heading: string;
+  description: string;
+  image: string;
+  points: string[];
+  button: string;
+  imagePosition: string;
+  href: string;
+}
+
 export default function ServicesPage() {
-  const services = [
+  const services: Service[] = [
     {
       id: "consultation",
       number: "01",
@@ -22,6 +36,7 @@ export default function ServicesPage() {
       ],
       button: "Get Consultation",
       imagePosition: "left",
+      href: "/contact?purpose=General Consultation",
     },
     {
       id: "buy",
@@ -38,6 +53,7 @@ export default function ServicesPage() {
       ],
       button: "Browse Properties",
       imagePosition: "right",
+      href: "/properties",
     },
     {
       id: "sell",
@@ -55,6 +71,7 @@ export default function ServicesPage() {
       ],
       button: "List Your Property",
       imagePosition: "left",
+      href: "/contact?purpose=Sell My Property",
     },
     {
       id: "construction",
@@ -71,7 +88,9 @@ export default function ServicesPage() {
         "Sustainable building practices",
       ],
       button: "Start Building",
+
       imagePosition: "right",
+      href: "/contact?purpose=General Consultation",
     },
   ];
 
@@ -80,29 +99,23 @@ export default function ServicesPage() {
       <Navbar />
       <main className="bg-gray-50">
         {/* Hero Banner */}
-        <section className="relative h-96 w-full pt-20">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url(https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1200&h=500&fit=crop)",
-            }}
-          />
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="relative flex h-full items-center justify-center">
+        <div className="bg-white border-b border-gray-200 pt-20">
+          <div className="mx-auto max-w-7xl px-4 py-8">
             <div className="text-center">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#C9963A]">
+              <span className="inline-flex items-center justify-center gap-2 text-sm uppercase tracking-widest text-[#C9963A] mb-3">
+                <span className="w-8 h-[2px] bg-[#C9963A]" />
                 What We Offer
-              </p>
-              <h1 className="mb-4 text-5xl font-bold text-white md:text-6xl">
+                <span className="w-8 h-[2px] bg-[#C9963A]" />
+              </span>
+              <h1 className="text-3xl font-bold text-[#4A4A4A]">
                 Our Services
               </h1>
-              <p className="text-lg text-gray-200">
+              <p className="mt-2 text-gray-500 max-w-xl mx-auto">
                 Comprehensive real estate solutions tailored for you
               </p>
             </div>
           </div>
-        </section>
+        </div>
 
         {/* Service Sections */}
         {services.map((service, index) => (
@@ -121,11 +134,14 @@ export default function ServicesPage() {
               >
                 {/* Image */}
                 <div className="flex-1">
-                  <img
-                    src={service.image}
-                    alt={service.heading}
-                    className="h-96 w-full rounded-lg object-cover shadow-lg"
-                  />
+                  <div className="relative h-96 w-full overflow-hidden rounded-lg shadow-lg">
+                    <Image
+                      src={service.image}
+                      alt={service.heading}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -151,9 +167,12 @@ export default function ServicesPage() {
                   </ul>
 
                   {/* Button */}
-                  <button className="rounded-full bg-[#29ABE2] px-8 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90">
+                  <a
+                    href={service.href}
+                    className="rounded-full bg-[#29ABE2] px-8 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
+                  >
                     {service.button}
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -171,12 +190,18 @@ export default function ServicesPage() {
               and expertise
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <button className="rounded-full bg-white px-8 py-3 font-semibold text-[#29ABE2] transition-colors hover:bg-gray-100">
+              <a
+                href="/contact"
+                className="rounded-full bg-white px-8 py-3 font-semibold text-[#29ABE2] transition-colors hover:bg-gray-100"
+              >
                 Contact Us
-              </button>
-              <button className="rounded-full border-2 border-white px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10">
+              </a>
+              <a
+                href="/properties"
+                className="rounded-full border-2 border-white px-8 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+              >
                 View Properties
-              </button>
+              </a>
             </div>
           </div>
         </section>

@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Toast, useToast } from "@/components/admin/toast";
+import { uploadImage } from "@/lib/upload";
+import RichTextEditor from "@/components/admin/rich-text-editor";
 
 export default function EditPropertyPage({
   params,
@@ -15,6 +17,7 @@ export default function EditPropertyPage({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const { toast, showToast, hideToast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -25,8 +28,11 @@ export default function EditPropertyPage({
     beds: "",
     baths: "",
     location: "",
+    map_url: "",
+
     description: "",
     images: "",
+    amenities: "",
     status: "Available",
     featured: false,
   });
@@ -50,8 +56,10 @@ export default function EditPropertyPage({
           beds: data.beds?.toString() || "",
           baths: data.baths?.toString() || "",
           location: data.location || "",
+          map_url: data.map_url || "",
           description: data.description || "",
           images: data.images || "",
+          amenities: data.amenities || "",
           status: data.status || "Available",
           featured: data.featured || false,
         });
@@ -60,6 +68,39 @@ export default function EditPropertyPage({
     };
     fetchProperty();
   }, [params]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+
+    const urls: string[] = [];
+    for (const file of Array.from(files)) {
+      const url = await uploadImage(file, "properties");
+      if (url) urls.push(url);
+    }
+
+    const currentImages = formData.images
+      ? formData.images
+          .split(",")
+          .map((i) => i.trim())
+          .filter(Boolean)
+      : [];
+
+    const allImages = [...currentImages, ...urls].join(", ");
+    setFormData((prev) => ({ ...prev, images: allImages }));
+    setIsUploading(false);
+  };
+
+  const removeImage = (url: string) => {
+    const current = formData.images
+      .split(",")
+      .map((i) => i.trim())
+      .filter(Boolean)
+      .filter((i) => i !== url);
+    setFormData((prev) => ({ ...prev, images: current.join(", ") }));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -97,8 +138,10 @@ export default function EditPropertyPage({
         beds: formData.beds ? parseInt(formData.beds) : 0,
         baths: formData.baths ? parseInt(formData.baths) : 0,
         location: formData.location,
+        map_url: formData.map_url,
         description: formData.description,
         images: formData.images,
+        amenities: formData.amenities,
         status: formData.status,
         featured: formData.featured,
       })
@@ -292,17 +335,39 @@ export default function EditPropertyPage({
                   />
                 </div>
 
+                {/* Map URL */}
+                <div>
+                  <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
+                    Google Maps Link
+                    <span className="text-gray-400 text-xs ml-2">
+                      (optional)
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="map_url"
+                    value={formData.map_url}
+                    onChange={handleChange}
+                    placeholder="Paste any Google Maps link here..."
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Works with any Google Maps link — share link, embed link, or
+                    copied URL
+                  </p>
+                </div>
+
+                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-[#4A4A4A] mb-2">
                     Description
                   </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
+                  <RichTextEditor
+                    content={formData.description}
+                    onChange={(content) =>
+                      setFormData((prev) => ({ ...prev, description: content }))
+                    }
                     placeholder="Describe the property..."
-                    rows={5}
-                    className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
                   />
                 </div>
               </div>
@@ -310,18 +375,175 @@ export default function EditPropertyPage({
 
             {/* Images */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-bold text-[#4A4A4A] mb-2">Images</h2>
+              <h2 className="text-lg font-bold text-[#4A4A4A] mb-2">
+                Property Images
+              </h2>
               <p className="text-xs text-gray-400 mb-4">
-                Paste image URLs separated by commas.
+                Upload multiple images. First image will be the main display
+                image.
               </p>
-              <textarea
-                name="images"
-                value={formData.images}
-                onChange={handleChange}
-                placeholder="https://image1.jpg, https://image2.jpg"
-                rows={3}
-                className="w-full px-4 py-2.5 border border-gray-200 text-[#4A4A4A] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
-              />
+
+              {/* Upload Button */}
+              <label
+                className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  isUploading
+                    ? "border-[#29ABE2] bg-[#29ABE2]/5"
+                    : "border-gray-300 hover:border-[#29ABE2] hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex flex-col items-center gap-2">
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="h-8 w-8 text-[#29ABE2] animate-spin" />
+                      <p className="text-sm text-[#29ABE2] font-medium">
+                        Uploading...
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-10 h-10 bg-[#29ABE2]/10 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-[#29ABE2]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium text-[#29ABE2]">
+                          Click to upload
+                        </span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        PNG, JPG, WEBP up to 10MB
+                      </p>
+                    </>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Image Previews */}
+              {formData.images && (
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {formData.images
+                    .split(",")
+                    .map((img) => img.trim())
+                    .filter(Boolean)
+                    .map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img
+                          src={img}
+                          alt={`Property image ${i + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        />
+                        {i === 0 && (
+                          <span className="absolute top-1 left-1 bg-[#29ABE2] text-white text-xs px-2 py-0.5 rounded-full">
+                            Main
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(img)}
+                          className="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs items-center justify-center hidden group-hover:flex"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Manual URL */}
+              <div className="mt-4">
+                <p className="text-xs text-gray-400 mb-2">
+                  Or paste image URLs manually (comma separated):
+                </p>
+                <textarea
+                  name="images"
+                  value={formData.images}
+                  onChange={handleChange}
+                  placeholder="https://image1.jpg, https://image2.jpg"
+                  rows={2}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#29ABE2] resize-none"
+                />
+              </div>
+            </div>
+            {/* Amenities */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-lg font-bold text-[#4A4A4A] mb-2">
+                Amenities
+              </h2>
+              <p className="text-xs text-gray-400 mb-4">
+                Select all available amenities for this property
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {[
+                  "Water",
+                  "Gas",
+                  "Electricity",
+                  "Internet",
+                  "Parking",
+                  "Security",
+                  "Mosque",
+                  "Park",
+                  "Swimming Pool",
+                  "Gym",
+                  "Generator",
+                  "CCTV",
+                ].map((amenity) => (
+                  <label
+                    key={amenity}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.amenities
+                        .split(",")
+                        .map((a) => a.trim())
+                        .includes(amenity)}
+                      onChange={(e) => {
+                        const current = formData.amenities
+                          ? formData.amenities
+                              .split(",")
+                              .map((a) => a.trim())
+                              .filter(Boolean)
+                          : [];
+                        if (e.target.checked) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            amenities: [...current, amenity].join(","),
+                          }));
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            amenities: current
+                              .filter((a) => a !== amenity)
+                              .join(","),
+                          }));
+                        }
+                      }}
+                      className="h-4 w-4 accent-[#29ABE2]"
+                    />
+                    <span className="text-sm text-[#4A4A4A]">{amenity}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 

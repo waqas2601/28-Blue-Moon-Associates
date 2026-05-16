@@ -2,7 +2,8 @@ import { Eye, Target } from "lucide-react";
 
 export default function About() {
   return (
-    <section id="about" className="bg-white pt-32 pb-20">
+    <section id="about" className="bg-white pt-64 sm:pt-48 lg:pt-32 pb-20">
+      {" "}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Column */}
@@ -22,7 +23,7 @@ export default function About() {
 
             {/* Paragraphs */}
             <p className="mb-4 text-base leading-relaxed text-[#4A4A4A]/80 sm:text-lg">
-              Founded in 2002, Blue Moon Associates has become a recognized
+              Founded in 2019, Blue Moon Associates has become a recognized
               force in Pakistan&apos;s real estate sector, delivering
               residential, commercial, and mixed-use developments with integrity
               and scale.
@@ -63,11 +64,11 @@ export default function About() {
             </div>
 
             {/* Mission Card */}
-            <div className="rounded-lg border-l-4 border-[#29ABE2] bg-gray-100 p-6 sm:p-8">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#29ABE2]/10">
-                <Target className="h-6 w-6 text-[#29ABE2]" />
+            <div className="rounded-lg border-l-4 border-[#C9963A] bg-gray-100 p-6 sm:p-8">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#C9963A]/10">
+                <Target className="h-6 w-6 text-[#C9963A]" />
               </div>
-              <h3 className="mb-3 text-xl font-bold text-[#29ABE2] sm:text-2xl">
+              <h3 className="mb-3 text-xl font-bold text-[#C9963A] sm:text-2xl">
                 Our Mission
               </h3>
               <p className="leading-relaxed text-[#4A4A4A]/80">

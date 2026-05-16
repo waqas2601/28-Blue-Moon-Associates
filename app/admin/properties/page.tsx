@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { Toast, useToast } from "@/components/admin/toast";
@@ -14,9 +14,31 @@ export default function PropertiesPage() {
   const { toast, showToast, hideToast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const fetchProperties = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setProperties(data || []);
+      setFiltered(data || []);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchProperties();
-  }, []);
+  }, [fetchProperties]);
+
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) fetchProperties();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [fetchProperties]);
 
   useEffect(() => {
     if (search) {
@@ -31,16 +53,6 @@ export default function PropertiesPage() {
       setFiltered(properties);
     }
   }, [search, properties]);
-
-  const fetchProperties = async () => {
-    const { data } = await supabase
-      .from("properties")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setProperties(data || []);
-    setFiltered(data || []);
-    setIsLoading(false);
-  };
 
   const handleDelete = async () => {
     if (!deleteId) return;

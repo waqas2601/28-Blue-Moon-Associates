@@ -1,19 +1,60 @@
-const stats = [
-  { number: "20+", label: "Years of Experience" },
-  { number: "500+", label: "Projects Marketed" },
-  { number: "10,000+", label: "Satisfied Clients" },
-];
+import { supabase } from "@/lib/supabase";
+import { unstable_noStore as noStore } from "next/cache";
+import Image from "next/image";
+import StatsCounter from "./stats-counter";
 
-export default function Hero() {
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop";
+
+async function getHeroSettings() {
+  noStore();
+  const { data } = await supabase
+    .from("settings")
+    .select("*")
+    .in("key", [
+      "hero_heading1",
+      "hero_heading2",
+      "hero_subtext",
+      "hero_video_url",
+      "stat_years",
+      "stat_projects",
+      "stat_clients",
+    ]);
+
+  if (!data) return {};
+  const s: Record<string, string> = {};
+  data.forEach((item: any) => {
+    s[item.key] = item.value;
+  });
+  return s;
+}
+
+export default async function Hero() {
+  const settings = await getHeroSettings();
+
+  const VIDEO_URL = settings.hero_video_url || "";
+
+
+  const stats = [
+    { number: settings.stat_years || "20+", label: "Years of Experience" },
+    { number: settings.stat_projects || "500+", label: "Projects Marketed" },
+    { number: settings.stat_clients || "10,000+", label: "Satisfied Clients" },
+  ];
   return (
     <section className="relative min-h-screen">
-      {/* Background Image with Dark Overlay */}
+      {/* Background — Video or Image */}
       <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
-          alt="Modern city buildings"
-          className="h-full w-full object-cover"
-        />
+        {VIDEO_URL ? (
+          <video autoPlay muted loop playsInline className="h-full w-full object-cover">
+            <source src={VIDEO_URL} type="video/mp4" />
+            <img src={HERO_IMAGE} alt="Blue Moon Associates" className="h-full w-full object-cover" />
+          </video>
+        ) : (
+          <div className="relative w-full h-full overflow-hidden">
+            <Image src={HERO_IMAGE} alt="Modern city buildings" fill className="object-cover" priority />
+          </div>
+        )}
+        {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
@@ -26,14 +67,12 @@ export default function Hero() {
 
         {/* Heading */}
         <h1 className="mb-6 text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
-          <span className="block text-balance">Building Dreams.</span>
-          <span className="block text-balance">Delivering Legacy.</span>
+          <span className="block">{settings.hero_heading1 || "Building Dreams."}</span>
+          <span className="block">{settings.hero_heading2 || "Delivering Legacy."}</span>
         </h1>
 
-        {/* Subtext */}
         <p className="mb-10 max-w-2xl text-base text-gray-300 sm:text-lg md:text-xl">
-          Your trusted partner in real estate — Consultants | Builders |
-          Developers
+          {settings.hero_subtext || "Your trusted partner in real estate — Consultants | Builders | Developers"}
         </p>
 
         {/* Buttons */}
@@ -44,6 +83,7 @@ export default function Hero() {
           >
             View Properties
           </a>
+
           <a
             href="/contact"
             className="rounded-full border-2 border-white px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-[#4A4A4A] sm:text-base"
@@ -53,26 +93,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Stats Boxes */}
-      <div className="absolute bottom-0 left-0 right-0 translate-y-1/2 px-4">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="flex flex-col items-center rounded-lg bg-white px-6 py-8 shadow-xl"
-              >
-                <span className="text-3xl font-bold text-[#29ABE2] sm:text-4xl">
-                  {stat.number}
-                </span>
-                <span className="mt-2 text-center text-sm font-medium text-[#4A4A4A] sm:text-base">
-                  {stat.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <StatsCounter stats={stats} />
     </section>
   );
 }

@@ -3,22 +3,27 @@
 import { useState } from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { SuccessPopup, ConfirmPopup } from "./success-popup";
+import { SuccessPopup } from "@/components/success-popup";
 
-const cities = ["Faisal Hills", "Faisal Town", "B-17", "Bahria Town", "DHA"];
+interface ContactProps {
+  phone?: string;
+  email?: string;
+  address?: string;
+}
 
-const projects = [
-  "The Grand Residencia",
-  "Blue Moon Heights",
-  "Capital Smart City",
-  "Park View City",
-  "Bahria Town",
-  "DHA Valley",
+const cities = [
+  "Faisal Hills",
+  "Multi Garden B-17",
+  "Faisal Town",
+  "Faisal Town Phase II",
+  "Other",
 ];
 
-const propertyTypes = ["Residential", "Commercial"];
-
-export default function Contact() {
+export default function Contact({
+  phone = "+92 336 921 8748",
+  email = "info@bluemoonassociates.com",
+  address = "Rawalpindi, Pakistan",
+}: ContactProps) {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -27,9 +32,10 @@ export default function Contact() {
     propertyType: "",
     message: "",
   });
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -38,9 +44,34 @@ export default function Contact() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
-  const handleSubmit = async () => {
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.fullName.trim() || formData.fullName.trim().length < 3) {
+      newErrors.fullName = "Please enter your full name (min 3 characters)";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Please enter your phone number";
+    } else if (!/^(\+92|0)[0-9]{10}$/.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone =
+        "Please enter a valid Pakistani number e.g. 03001234567";
+    }
+    if (!formData.purpose) {
+      newErrors.purpose = "Please select your purpose of inquiry";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmitClick = async () => {
+    if (!validate()) return;
     setIsLoading(true);
 
     const { error } = await supabase.from("leads").insert([
@@ -57,11 +88,11 @@ export default function Contact() {
     ]);
 
     setIsLoading(false);
-    setShowConfirm(false);
 
     if (error) {
-      alert("Something went wrong. Please try again.");
+      setSubmitError("Something went wrong. Please try again.");
     } else {
+      setSubmitError("");
       setShowSuccess(true);
       setFormData({
         fullName: "",
@@ -71,6 +102,7 @@ export default function Contact() {
         propertyType: "",
         message: "",
       });
+      setErrors({});
     }
   };
 
@@ -80,59 +112,45 @@ export default function Contact() {
         <div className="grid gap-12 lg:grid-cols-2">
           {/* Left Column */}
           <div className="flex flex-col justify-center">
-            {/* Label */}
             <div className="mb-4 flex items-center gap-3">
               <span className="text-sm font-semibold uppercase tracking-wider text-[#C9963A]">
                 Contact Us
               </span>
               <div className="h-px w-12 bg-[#C9963A]" />
             </div>
-
-            {/* Heading */}
             <h2 className="mb-4 text-3xl font-bold text-[#4A4A4A] md:text-4xl">
               Start Your Investment Journey
             </h2>
-
-            {/* Subtext */}
             <p className="mb-8 text-[#4A4A4A]/70">
               Connect with our advisory team for project details, pricing, and
               exclusive investment opportunities.
             </p>
-
-            {/* Info Boxes */}
             <div className="flex flex-col gap-6">
-              {/* Phone */}
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#29ABE2]/10">
                   <Phone className="h-6 w-6 text-[#29ABE2]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-[#4A4A4A]">Call Us</h3>
-                  <p className="text-[#4A4A4A]/70">+92 336 921 8748</p>{" "}
+                  <p className="text-[#4A4A4A]/70">{phone}</p>{" "}
                 </div>
               </div>
-
-              {/* Email */}
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#29ABE2]/10">
                   <Mail className="h-6 w-6 text-[#29ABE2]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-[#4A4A4A]">Email Us</h3>
-                  <p className="text-[#4A4A4A]/70">
-                    info@bluemoonassociates.com
-                  </p>
+                  <p className="text-[#4A4A4A]/70">{email}</p>
                 </div>
               </div>
-
-              {/* Location */}
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#29ABE2]/10">
                   <MapPin className="h-6 w-6 text-[#29ABE2]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-[#4A4A4A]">Visit Us</h3>
-                  <p className="text-[#4A4A4A]/70">Rawalpindi, Pakistan</p>
+                  <p className="text-[#4A4A4A]/70">{address}</p>
                 </div>
               </div>
             </div>
@@ -140,7 +158,7 @@ export default function Contact() {
 
           {/* Right Column - Form */}
           <div className="rounded-xl bg-white p-6 shadow-lg md:p-8">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5">
               {/* Full Name */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-[#4A4A4A]">
@@ -152,10 +170,15 @@ export default function Contact() {
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="Enter your full name"
-                  minLength={3}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
+                  className={`w-full rounded-lg border px-4 py-3 text-sm text-[#4A4A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20 ${
+                    errors.fullName
+                      ? "border-red-400 bg-red-50"
+                      : "border-gray-300 focus:border-[#29ABE2]"
+                  }`}
                 />
+                {errors.fullName && (
+                  <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
+                )}
               </div>
 
               {/* Phone */}
@@ -169,9 +192,15 @@ export default function Contact() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+92 300 0000000"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
+                  className={`w-full rounded-lg border px-4 py-3 text-sm text-[#4A4A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20 ${
+                    errors.phone
+                      ? "border-red-400 bg-red-50"
+                      : "border-gray-300 focus:border-[#29ABE2]"
+                  }`}
                 />
+                {errors.phone && (
+                  <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                )}
               </div>
 
               {/* Purpose */}
@@ -183,8 +212,11 @@ export default function Contact() {
                   name="purpose"
                   value={formData.purpose}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
-                  required
+                  className={`w-full rounded-lg border bg-white px-4 py-3 text-sm text-[#4A4A4A] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20 ${
+                    errors.purpose
+                      ? "border-red-400 bg-red-50"
+                      : "border-gray-300 focus:border-[#29ABE2]"
+                  }`}
                 >
                   <option value="">— Select Your Purpose —</option>
                   <option value="Buy a Property">Buy a Property</option>
@@ -194,6 +226,9 @@ export default function Contact() {
                     General Consultation
                   </option>
                 </select>
+                {errors.purpose && (
+                  <p className="mt-1 text-xs text-red-500">{errors.purpose}</p>
+                )}
               </div>
 
               {/* Society */}
@@ -205,16 +240,14 @@ export default function Contact() {
                   name="society"
                   value={formData.society}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                 >
                   <option value="">— All Societies —</option>
-                  <option value="Faisal Hills">Faisal Hills</option>
-                  <option value="Multi Garden B-17">Multi Garden B-17</option>
-                  <option value="Faisal Town">Faisal Town</option>
-                  <option value="Faisal Town Phase II">
-                    Faisal Town Phase II
-                  </option>
-                  <option value="Other">Other</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -227,7 +260,7 @@ export default function Contact() {
                   name="propertyType"
                   value={formData.propertyType}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                 >
                   <option value="">— Select Property Type —</option>
                   <option value="Residential Plot">Residential Plot</option>
@@ -250,28 +283,37 @@ export default function Contact() {
                   onChange={handleChange}
                   placeholder="Tell us about your requirement..."
                   rows={4}
-                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-[#4A4A4A] focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
+                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm text-[#4A4A4A] placeholder:text-gray-400 focus:border-[#29ABE2] focus:outline-none focus:ring-2 focus:ring-[#29ABE2]/20"
                 />
               </div>
+
+              {/* Submit error */}
+              {submitError && (
+                <p className="text-sm text-red-600 bg-red-50 px-4 py-2.5 rounded-lg border border-red-200">
+                  {submitError}
+                </p>
+              )}
 
               {/* Submit */}
               <button
                 type="button"
-                onClick={() => setShowConfirm(true)}
-                className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90"
+                onClick={handleSubmitClick}
+                disabled={isLoading}
+                className="w-full rounded-lg bg-[#29ABE2] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#29ABE2]/90 disabled:opacity-70 flex items-center justify-center gap-2"
               >
-                Send Message
+                {isLoading ? (
+                  <>
+                    <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message"
+                )}
               </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
-      <ConfirmPopup
-        isOpen={showConfirm}
-        onConfirm={handleSubmit}
-        onCancel={() => setShowConfirm(false)}
-        isLoading={isLoading}
-      />
 
       <SuccessPopup
         isOpen={showSuccess}

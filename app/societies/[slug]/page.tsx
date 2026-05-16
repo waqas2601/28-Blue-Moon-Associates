@@ -9,6 +9,7 @@ import {
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { societies } from "@/lib/societies";
+import SocietyForm from "@/components/society-form";
 
 export default async function SocietyPage({
   params,
@@ -149,13 +150,16 @@ export default async function SocietyPage({
               </h2>
             </div>
             <div className="grid gap-8 lg:grid-cols-2">
-              <div className="flex items-center justify-center rounded-xl bg-gray-100 h-80">
-                <div className="text-center">
-                  <MapPin className="mx-auto h-16 w-16 text-[#29ABE2]/30" />
-                  <p className="mt-4 text-[#4A4A4A]/50 font-medium">
-                    Map Coming Soon
-                  </p>
-                </div>
+              <div className="overflow-hidden rounded-xl border border-gray-200 h-80">
+                <iframe
+                  src={society.mapEmbed}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
               <div className="space-y-4">
                 {society.landmarks.map((item) => (
@@ -188,38 +192,7 @@ export default async function SocietyPage({
             <p className="mt-2 text-white/80">
               Get in touch with our team for more details
             </p>
-            <div className="mt-8 space-y-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                className="w-full rounded-lg border border-white/30 bg-white/20 px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
-              />
-              <input
-                type="tel"
-                placeholder="Your Phone Number"
-                className="w-full rounded-lg border border-white/30 bg-white/20 px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
-              />
-              <textarea
-                placeholder="Your Message"
-                rows={3}
-                className="w-full rounded-lg border border-white/30 bg-white/20 px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
-              />
-              <div className="flex gap-3">
-                <button className="flex-1 rounded-lg bg-white px-6 py-3 font-semibold text-[#29ABE2] hover:bg-gray-100 transition-colors">
-                  Submit Inquiry
-                </button>
-
-                <a
-                  href={`https://wa.me/923369218748?text=Hi, I am interested in properties in ${society.name}. Please contact me.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg bg-green-500 px-6 py-3 font-semibold text-white hover:bg-green-600 transition-colors"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  WhatsApp
-                </a>
-              </div>
-            </div>
+            <SocietyForm societyName={society.name} />
           </div>
         </section>
       </main>
